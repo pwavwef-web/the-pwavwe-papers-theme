@@ -1,0 +1,82 @@
+<!-- ============================================================
+     THE PWAVWE PAPERS — "Contact" page
+     ------------------------------------------------------------
+     HOW TO INSTALL
+     1. Blogger → Pages → New page
+     2. Title the page:  Contact
+     3. Switch the editor to  HTML view  (top-left "HTML"/"< >"
+        toggle) — do NOT use Compose view
+     4. Paste EVERYTHING in this file, then Publish
+     5. The published URL will be  /p/contact.html  — it is already
+        linked from the theme's header nav and footer.
+
+     EDIT ME: set your real address in ONE place — the CONTACT_EMAIL
+     line in the <script> at the bottom. The button and mailto link
+     are wired to it automatically. The address is assembled in JS so
+     it isn't sitting in the raw HTML for scrapers to harvest.
+     ============================================================ -->
+
+<style>
+.article-byline, .author-box, .comments-wrap, .article-aside, .article-hero { display: none !important; }
+.article-layout { grid-template-columns: minmax(0, 640px) !important; }
+
+.contact-page { font-family: 'Inter', Arial, sans-serif; color: var(--ink); }
+.contact-page * { box-sizing: border-box; }
+.contact-page .lede {
+  font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
+  font-size: clamp(1.35rem, 3vw, 1.9rem); line-height: 1.3; margin: 0 0 22px;
+}
+.contact-page p { font-size: 1.02rem; line-height: 1.8; margin: 0 0 20px; }
+.contact-card {
+  border: 1px solid var(--line); background: var(--card);
+  border-radius: 16px; padding: 26px 24px; margin: 8px 0 24px; text-align: center;
+}
+.contact-card .k {
+  display: block; color: var(--muted); font-size: .72rem; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px;
+}
+.contact-email {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(1.2rem, 3.4vw, 1.7rem); color: var(--ink); text-decoration: none; word-break: break-word;
+}
+.contact-email:hover { color: var(--accent); }
+.contact-btn {
+  display: inline-block; margin-top: 18px; border: 0; cursor: pointer;
+  background: var(--accent); color: #fff; border-radius: 999px;
+  padding: 12px 26px; font: 700 .95rem 'Inter', Arial, sans-serif; text-decoration: none;
+}
+.contact-btn:hover { filter: brightness(1.06); }
+.contact-alt { color: var(--muted); font-size: .92rem; line-height: 1.7; }
+.contact-alt a { color: var(--accent); text-decoration: none; }
+.contact-alt a:hover { text-decoration: underline; }
+</style>
+
+<div class="contact-page">
+  <p class="lede">Say hello.</p>
+  <p>Questions, corrections, a good rabbit hole I should fall into, or a note about something you read here — all welcome. I read everything and reply when a message deserves one.</p>
+
+  <div class="contact-card">
+    <span class="k">Email</span>
+    <a class="contact-email" id="cEmail" href="#">loading…</a>
+    <br/>
+    <a class="contact-btn" id="cBtn" href="#">Write a message</a>
+  </div>
+
+  <p class="contact-alt">You can also find more of my work at <a href="https://pwavwe.com" rel="noopener">pwavwe.com</a>, or browse everything published here in <a href="/p/all-papers.html">All papers</a>. For how your data is handled, see the <a href="/p/privacy.html">privacy page</a>.</p>
+</div>
+
+<script>
+(function () {
+  // ---- EDIT ME: your contact address (assembled to dodge scrapers) ----
+  var USER = 'pwavwef';        // part before the @
+  var DOMAIN = 'gmail.com';    // part after the @
+  var SUBJECT = 'Hello from The Pwavwe Papers';
+  // ---------------------------------------------------------------------
+  var addr = USER + '@' + DOMAIN;
+  var link = document.getElementById('cEmail');
+  var btn = document.getElementById('cBtn');
+  link.textContent = addr;
+  link.href = 'mailto:' + addr;
+  btn.href = 'mailto:' + addr + '?subject=' + encodeURIComponent(SUBJECT);
+})();
+</script>
