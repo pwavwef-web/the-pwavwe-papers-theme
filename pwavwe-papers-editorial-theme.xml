@@ -167,27 +167,63 @@ button, input { font: inherit; }
 .mobile-nav a { font-weight: 700; font-size: .95rem; }
 
 /* Masthead */
-.masthead { padding: 70px 0 48px; border-bottom: 1px solid var(--line); }
+.masthead { padding: 74px 0 54px; border-bottom: 1px solid var(--line); }
+.masthead-grid {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 260px);
+  gap: clamp(32px, 5vw, 72px); align-items: end;
+}
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   color: var(--accent); font-size: .74rem; font-weight: 800;
   letter-spacing: .16em; text-transform: uppercase;
 }
 .eyebrow:before { content: ''; width: 26px; height: 2px; background: currentColor; }
-.masthead h1 {
-  margin: 18px 0 18px; max-width: 920px;
+.masthead-lead h1 {
+  margin: 20px 0 0; max-width: 15ch;
   font-family: var(--serif); font-size: clamp(3.1rem, 8.5vw, 7.8rem);
   line-height: .88; letter-spacing: -.035em; font-weight: 400;
 }
-.masthead p {
-  max-width: 720px; margin: 0; color: var(--muted);
+.masthead-mark {
+  display: block; width: 64px; height: 3px; margin: 30px 0 26px;
+  background: var(--accent); border-radius: 2px;
+}
+.masthead-lead p {
+  max-width: 44ch; margin: 0; color: var(--muted);
   font: 500 clamp(1rem, 2vw, 1.28rem)/1.7 var(--sans);
 }
-.masthead-meta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
-.pill {
-  border: 1px solid var(--line); border-radius: 999px; padding: 9px 13px;
-  font-size: .76rem; font-weight: 700; color: var(--muted); background: var(--card);
+.masthead-rail {
+  display: flex; flex-direction: column;
+  border-top: 1px solid var(--line);
 }
+.rail-item {
+  position: relative; padding: 15px 0 15px 18px;
+  border-bottom: 1px solid var(--line);
+  font-size: .8rem; font-weight: 700; line-height: 1.4;
+  letter-spacing: .01em; color: var(--muted);
+}
+.rail-item:before {
+  content: ''; position: absolute; left: 0; top: 20px;
+  width: 7px; height: 7px; border-radius: 999px; background: var(--accent);
+}
+/* Masthead entrance */
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.masthead-lead .eyebrow,
+.masthead-lead h1,
+.masthead-mark,
+.masthead-lead p,
+.masthead-rail .rail-item {
+  animation: riseIn .6s cubic-bezier(.22, .61, .36, 1) both;
+}
+.masthead-lead .eyebrow { animation-delay: 0s; }
+.masthead-lead h1 { animation-delay: .07s; }
+.masthead-mark { animation-delay: .16s; }
+.masthead-lead p { animation-delay: .22s; }
+.masthead-rail .rail-item:nth-child(1) { animation-delay: .28s; }
+.masthead-rail .rail-item:nth-child(2) { animation-delay: .35s; }
+.masthead-rail .rail-item:nth-child(3) { animation-delay: .42s; }
 
 /* Index / cards */
 .index-section { padding: 55px 0 80px; }
@@ -734,6 +770,9 @@ button, input { font: inherit; }
   .icon-btn { width: 36px; height: 36px; }
   .masthead { padding: 48px 0 34px; }
   .masthead h1 { font-size: clamp(3.3rem, 17vw, 5.7rem); }
+  .masthead-grid { grid-template-columns: 1fr; gap: 30px; align-items: start; }
+  .masthead-mark { margin: 26px 0 22px; }
+  .masthead-rail { max-width: 420px; }
   .posts-grid { grid-template-columns: 1fr; gap: 34px; }
   .post-card:first-child { padding-bottom: 36px; }
   .post-card:first-child h2 { font-size: clamp(2.5rem, 12vw, 4.4rem); }
@@ -748,7 +787,7 @@ button, input { font: inherit; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; }
+  *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
   ]]></b:skin>
 </head>
@@ -816,27 +855,30 @@ button, input { font: inherit; }
         </section>
       <b:else/>
         <section class='masthead'>
-          <div class='wrap'>
-            <span class='eyebrow'>An independent digital notebook</span>
-            <!-- Headline pulls from Blogger → Settings → Description, so you can
-                 reword it without editing the theme. An empty Description falls
-                 back to the static line below. -->
-            <b:section class='masthead-headline' id='mastheadHeadline' maxwidgets='1' showaddelement='no'>
-              <b:widget id='Header1' locked='true' title='Masthead headline (blog Description)' type='Header' version='2'>
-                <b:includable id='main'>
-                  <b:if cond='data:description != &quot;&quot;'>
-                    <h1><data:description/></h1>
-                  <b:else/>
-                    <h1>The things I can’t stop thinking about.</h1>
-                  </b:if>
-                </b:includable>
-              </b:widget>
-            </b:section>
-            <p>Ideas, technology, travel, business, culture and the beautifully random rabbit holes worth following — written by Francis Pwavwe.</p>
-            <div class='masthead-meta'>
-              <span class='pill'>Accra / Cape Coast / Internet</span>
-              <span class='pill'>Curiosity over certainty</span>
-              <span class='pill'>New papers when there’s something worth saying</span>
+          <div class='wrap masthead-grid'>
+            <div class='masthead-lead'>
+              <span class='eyebrow'>An independent digital notebook</span>
+              <!-- Headline pulls from Blogger → Settings → Description, so you can
+                   reword it without editing the theme. An empty Description falls
+                   back to the static line below. -->
+              <b:section class='masthead-headline' id='mastheadHeadline' maxwidgets='1' showaddelement='no'>
+                <b:widget id='Header1' locked='true' title='Masthead headline (blog Description)' type='Header' version='2'>
+                  <b:includable id='main'>
+                    <b:if cond='data:description != &quot;&quot;'>
+                      <h1><data:description/></h1>
+                    <b:else/>
+                      <h1>The things I can’t stop thinking about.</h1>
+                    </b:if>
+                  </b:includable>
+                </b:widget>
+              </b:section>
+              <span class='masthead-mark'></span>
+              <p>Ideas, technology, travel, business, culture and the beautifully random rabbit holes worth following — written by Francis Pwavwe.</p>
+            </div>
+            <div class='masthead-rail'>
+              <span class='rail-item'>Accra / Cape Coast / Internet</span>
+              <span class='rail-item'>Curiosity over certainty</span>
+              <span class='rail-item'>New papers when there’s something worth saying</span>
             </div>
           </div>
         </section>
