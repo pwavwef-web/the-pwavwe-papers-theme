@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html>
 <html b:css='false' b:defaultwidgetversion='1' b:layoutsVersion='3' b:responsive='true'
-      expr:dir='data:blog.languageDirection'
+      expr:dir='data:blog.languageDirection' lang='en'
       xmlns='http://www.w3.org/1999/xhtml'
       xmlns:b='http://www.google.com/2005/gml/b'
       xmlns:data='http://www.google.com/2005/gml/data'
@@ -9,8 +9,22 @@
 <head>
   <meta content='width=device-width, initial-scale=1, viewport-fit=cover' name='viewport'/>
   <b:include data='blog' name='all-head-content'/>
-  <title><data:blog.pageTitle/></title>
+  <!-- Homepage gets a descriptive, keyword-bearing title; every other page keeps
+       Blogger's own pageTitle (post title, label name, search query, etc.). -->
+  <b:if cond='data:blog.url == data:blog.homepageUrl'>
+    <title>The Pwavwe Papers — Essays on ideas, technology, business, travel &amp; culture</title>
+  <b:else/>
+    <title><data:blog.pageTitle/></title>
+  </b:if>
   <meta content='#f7f4ee' name='theme-color'/>
+
+  <!-- Meta description. Blogger's all-head-content already emits one whenever a
+       page/post has a Search Description set (Settings → Meta tags), so this only
+       adds a site-wide fallback when none exists — e.g. the homepage, label and
+       archive pages — without ever producing a duplicate description tag. -->
+  <b:if cond='!data:blog.metaDescription'>
+    <meta content='The Pwavwe Papers — long-form essays on ideas, technology, business, travel and culture by Francis Pwavwe. Curiosity over certainty.' name='description'/>
+  </b:if>
 
   <!-- Favicon. Blogger serves the icon set in Settings → Favicon at /favicon.ico.
        For a crisp home-screen icon on iOS/Android, host a 180×180 PNG and
@@ -65,6 +79,36 @@
     <meta content='https://blogs.pwavwe.com/default-share.png' name='twitter:image'/>
     -->
   </b:if>
+
+  <!-- Structured data (JSON-LD): site identity + on-site search box. The per-post
+       BlogPosting and BreadcrumbList blocks are injected at runtime by the script
+       at the foot of the page, so post titles can never break the JSON. -->
+  <script type='application/ld+json'>{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://blogs.pwavwe.com/#website",
+      "url": "https://blogs.pwavwe.com/",
+      "name": "The Pwavwe Papers",
+      "description": "Long-form essays on ideas, technology, business, travel and culture by Francis Pwavwe.",
+      "inLanguage": "en",
+      "publisher": { "@id": "https://blogs.pwavwe.com/#person" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": { "@type": "EntryPoint", "urlTemplate": "https://blogs.pwavwe.com/search?q={search_term_string}" },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://blogs.pwavwe.com/#person",
+      "name": "Francis Pwavwe",
+      "url": "https://pwavwe.com",
+      "sameAs": [ "https://pwavwe.com" ]
+    }
+  ]
+}</script>
 
   <link href='https://fonts.googleapis.com' rel='preconnect'/>
   <link crossorigin='anonymous' href='https://fonts.gstatic.com' rel='preconnect'/>
@@ -587,13 +631,22 @@ button, input { font: inherit; }
 
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); padding: 46px 0 56px; }
-.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 34px; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.4fr; gap: 34px; }
 .footer-brand { font: 400 2rem/1 var(--serif); }
 .footer-copy { margin-top: 12px; max-width: 460px; color: var(--muted); font-size: .86rem; line-height: 1.65; }
 .footer-heading { margin-bottom: 12px; font-size: .7rem; font-weight: 800; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
 .footer-links { display: grid; gap: 9px; font-size: .85rem; font-weight: 650; }
 .footer-links a:hover { color: var(--accent); }
 .footer-bottom { margin-top: 38px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: .72rem; }
+.footer-sub-copy { margin: 0 0 14px; max-width: 320px; color: var(--muted); font-size: .85rem; line-height: 1.6; }
+.footer-sub-form { display: flex; gap: 8px; max-width: 340px; margin: 0; }
+.footer-sub-form .subscribe-input { padding: 10px 14px; font-size: .88rem; }
+.footer-sub-form .subscribe-btn { padding: 10px 16px; font-size: .78rem; }
+.footer-subscribe .subscribe-note { min-height: 0; margin: 10px 0 0; font-size: .8rem; }
+@media (max-width: 420px) {
+  .footer-sub-form { flex-direction: column; }
+  .footer-sub-form .subscribe-btn { width: 100%; }
+}
 
 /* Blogger cleanup */
 .widget, .widget-content { margin: 0; }
@@ -785,6 +838,23 @@ button, input { font: inherit; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer-grid > :first-child { grid-column: auto; }
 }
+
+/* Visible keyboard focus (accessibility). Only shows for keyboard/AT users via
+   :focus-visible, so mouse clicks stay clean. Placed late so it wins over the
+   `outline: none` on the search and subscribe inputs. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.search-row input:focus-visible,
+.subscribe-input:focus-visible { outline-offset: 1px; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
@@ -1168,6 +1238,16 @@ button, input { font: inherit; }
               <a href='https://pwavwe.com'>pwavwe.com ↗</a>
             </div>
           </div>
+          <div class='footer-subscribe'>
+            <div class='footer-heading'>Newsletter</div>
+            <p class='footer-sub-copy'>New papers in your inbox. No spam, no schedule — just a note when there’s something worth saying.</p>
+            <form class='subscribe-form footer-sub-form' id='fp-footer-sub'>
+              <input aria-label='Email address' autocomplete='email' class='subscribe-input' id='fp-footer-email' name='email' placeholder='you@example.com' required='required' spellcheck='false' type='email'/>
+              <input aria-hidden='true' autocomplete='off' id='fp-footer-website' name='website' style='position:absolute;left:-9999px' tabindex='-1' type='text'/>
+              <button class='subscribe-btn' type='submit'>Subscribe</button>
+            </form>
+            <p class='subscribe-note' id='fp-footer-msg'/>
+          </div>
         </div>
         <div class='footer-bottom'>© The Pwavwe Papers · Built on Blogger, dressed like it deserves better.</div>
       </div>
@@ -1282,6 +1362,51 @@ button, input { font: inherit; }
     var minutes = Math.max(1, Math.ceil(words / 220));
     var readingTime = document.getElementById('readingTime');
     if (readingTime) readingTime.textContent = minutes + ' min read';
+
+    // Structured data (JSON-LD) for this paper. Built here rather than in the
+    // template so titles/descriptions are escaped safely via JSON.stringify.
+    (function () {
+      function metaOf(sel) { var m = document.querySelector(sel); return m ? (m.getAttribute('content') || '').trim() : ''; }
+      var canonEl = document.querySelector('link[rel="canonical"]');
+      var canonical = (canonEl && canonEl.href) || window.location.href;
+      var title = (content.getAttribute('data-post-title') || document.title || '').trim();
+      var desc = metaOf('meta[name="description"]') || metaOf('meta[property="og:description"]');
+      var heroImg = document.querySelector('.article-hero img');
+      var image = metaOf('meta[property="og:image"]') || (heroImg && heroImg.src) || '';
+      var published = metaOf('meta[itemprop="datePublished"]');
+      var modified = metaOf('meta[itemprop="dateModified"]') || published;
+      var author = { '@type': 'Person', name: 'Francis Pwavwe', url: 'https://pwavwe.com' };
+
+      var post = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        headline: title,
+        url: canonical,
+        author: author,
+        publisher: author,
+        inLanguage: 'en'
+      };
+      if (desc) post.description = desc;
+      if (image) post.image = image;
+      if (published) post.datePublished = published;
+      if (modified) post.dateModified = modified;
+
+      var crumbs = [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://blogs.pwavwe.com/' }];
+      var firstLabel = document.querySelector('.article-kicker a');
+      if (firstLabel) {
+        crumbs.push({ '@type': 'ListItem', position: 2, name: (firstLabel.textContent || '').trim(), item: firstLabel.href });
+      }
+      crumbs.push({ '@type': 'ListItem', position: crumbs.length + 1, name: title, item: canonical });
+      var breadcrumb = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs };
+
+      [post, breadcrumb].forEach(function (obj) {
+        var s = document.createElement('script');
+        s.type = 'application/ld+json';
+        s.text = JSON.stringify(obj);
+        document.head.appendChild(s);
+      });
+    })();
 
     var headings = content.querySelectorAll('h2, h3');
     var toc = document.getElementById('toc');
@@ -1500,6 +1625,64 @@ button, input { font: inherit; }
         });
       }
     }
+  }
+
+  // Persistent footer newsletter (present on every page). The Firebase SDK is
+  // loaded lazily on first interaction, so it adds nothing to initial page load.
+  var footerForm = document.getElementById('fp-footer-sub');
+  if (footerForm) {
+    var footerEmail = document.getElementById('fp-footer-email');
+    var footerMsg = document.getElementById('fp-footer-msg');
+    var fbConfig = {apiKey:"AIzaSyB6lxgjNY4CRNHAe3pAgR5SYv1ohL8brOI",authDomain:"francis-pwavwe.firebaseapp.com",projectId:"francis-pwavwe",storageBucket:"francis-pwavwe.firebasestorage.app",messagingSenderId:"658069378543",appId:"1:658069378543:web:87b1dcb0dd27d3255bd21a"};
+    var fbLoading = null;
+
+    function loadFbScript(src) {
+      return new Promise(function (resolve, reject) {
+        var existing = document.querySelector('script[data-fb-src="' + src + '"]');
+        if (existing) {
+          if (existing.getAttribute('data-loaded')) { resolve(); }
+          else { existing.addEventListener('load', function () { resolve(); }); existing.addEventListener('error', reject); }
+          return;
+        }
+        var s = document.createElement('script');
+        s.src = src; s.async = true; s.setAttribute('data-fb-src', src);
+        s.addEventListener('load', function () { s.setAttribute('data-loaded', '1'); resolve(); });
+        s.addEventListener('error', reject);
+        document.head.appendChild(s);
+      });
+    }
+    function ensureFirebase() {
+      if (typeof firebase !== 'undefined' && firebase.firestore) return Promise.resolve();
+      if (fbLoading) return fbLoading;
+      fbLoading = loadFbScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js')
+        .then(function () { return loadFbScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js'); });
+      return fbLoading;
+    }
+    function footerDb() {
+      if (!firebase.apps.length) firebase.initializeApp(fbConfig);
+      return firebase.firestore();
+    }
+    if (footerEmail) footerEmail.addEventListener('focus', function () { ensureFirebase().catch(function () {}); }, { once: true });
+
+    footerForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var hp = document.getElementById('fp-footer-website');
+      if (hp && hp.value) return;
+      var email = footerEmail ? footerEmail.value.trim() : '';
+      if (!email) return;
+      var btn = footerForm.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      if (footerMsg) footerMsg.textContent = 'One moment…';
+      ensureFirebase().then(function () {
+        return footerDb().collection('subscribers').add({ email: email, source: 'footer', status: 'subscribed', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+      }).then(function () {
+        if (footerMsg) footerMsg.textContent = 'You are in — thanks for subscribing.';
+        footerForm.reset();
+      }).catch(function (err) {
+        if (footerMsg) footerMsg.textContent = 'Hmm, that did not save. Please try again.';
+        console.error(err);
+      }).then(function () { if (btn) btn.disabled = false; });
+    });
   }
 })();
 //]]>
