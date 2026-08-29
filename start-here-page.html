@@ -7,9 +7,8 @@
      3. Switch the editor to  HTML view  (top-left "HTML"/"< >"
         toggle) — do NOT use Compose view
      4. Paste EVERYTHING in this file, then Publish
-     5. The published URL will be  /p/start-here.html  — add it to
-        the theme's header nav and/or footer "Explore" list so new
-        readers can find it.
+     5. The published URL will be  /p/start-here.html  — the current
+        theme links it from the header, mobile menu and footer.
 
      WHAT IT DOES
      • "Editor's picks" — your hand-chosen flagship essays. Empty by
@@ -74,7 +73,7 @@
 .sh-cluster-blurb { margin: 0 0 14px; color: var(--muted); font-size: .9rem; line-height: 1.6; }
 .sh-cluster-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
 .sh-cluster-list a { color: var(--ink); text-decoration: none; font-size: .95rem; line-height: 1.4; display: block; }
-.sh-cluster-list a:before { content: '→'; color: var(--accent); margin-right: 8px; }
+.sh-cluster-list a:before { content: '\2192'; color: var(--accent); margin-right: 8px; }
 .sh-cluster-list a:hover { color: var(--accent); }
 .sh-cluster-more { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
 .sh-cluster-more:hover { text-decoration: underline; }
@@ -139,17 +138,31 @@
 (function () {
   // ---- [edit] Your hand-picked flagship essays (see comment above) ----
   var FEATURED = [
-    // { url: '/2026/07/example-post.html', title: 'An example essay', note: 'Why a newcomer should read this first.' },
+    {
+      url: '/2026/08/smart-file-organizer-asks-before-moving-files.html',
+      title: 'I Built a File Organizer That Asks Before It Touches Anything',
+      note: 'A practical argument for automation that keeps people in control.'
+    },
+    {
+      url: '/2026/08/your-tiktok-feed-is-rewriting-your.html',
+      title: 'Your TikTok Feed Is Rewriting Your Culture',
+      note: 'A distinctly Ghanaian look at algorithms, identity and cultural memory.'
+    },
+    {
+      url: '/2026/07/why-ghana-is-one-of-africas-most.html',
+      title: 'Why Ghana Is One of Africa\u2019s Most Underrated Tourist Destinations',
+      note: 'Tourism, place and possibility from a writer trained to notice all three.'
+    }
   ];
 
   // ---- Topic clusters. label must match a Blogger label exactly. A cluster
   //      whose label has no posts hides itself, so extras are harmless. ----
   var CLUSTERS = [
-    { label: 'Technology', title: 'Technology',   blurb: 'What a piece of tech actually changes — beyond the hype cycle.' },
+    { label: 'Technology', title: 'Technology',   blurb: 'What a piece of tech actually changes \u2014 beyond the hype cycle.' },
     { label: 'Business',   title: 'Business',     blurb: 'Ideas and models worth stress-testing, from someone who builds.' },
     { label: 'Ideas',      title: 'Ideas',        blurb: 'The essays that are really just a good question, followed all the way down.' },
     { label: 'Ghana',      title: 'Ghana',        blurb: 'Student life, graduate life, and the view from Accra and Cape Coast.' },
-    { label: 'Philosophy', title: 'Philosophy',   blurb: 'Belief, doubt and the big questions — argued honestly, not settled.' },
+    { label: 'Philosophy', title: 'Philosophy',   blurb: 'Belief, doubt and the big questions \u2014 argued honestly, not settled.' },
     { label: 'Travel',     title: 'Travel',       blurb: 'Where the industry is genuinely headed, and the pleasure of going.' }
   ];
 
@@ -182,7 +195,7 @@
     card.innerHTML =
       '<h3><a href="' + esc(labelUrl) + '">' + esc(c.title) + '</a></h3>' +
       '<p class="sh-cluster-blurb">' + esc(c.blurb) + '</p>' +
-      '<div class="sh-cluster-loading">Loading…</div>';
+      '<div class="sh-cluster-loading">Loading\u2026</div>';
     wrap.appendChild(card);
 
     fetch('/feeds/posts/default/-/' + encodeURIComponent(c.label) + '?alt=json&max-results=3')
@@ -200,7 +213,7 @@
         if (!items.length) { card.remove(); return; } // no posts under this label — drop the card
         card.querySelector('.sh-cluster-loading').outerHTML =
           '<ul class="sh-cluster-list">' + items.join('') + '</ul>' +
-          '<a class="sh-cluster-more" href="' + esc(labelUrl) + '">Browse all ' + esc(c.title) + ' →</a>';
+          '<a class="sh-cluster-more" href="' + esc(labelUrl) + '">Browse all ' + esc(c.title) + ' \u2192</a>';
         card.style.display = '';
       })
       .catch(function () { card.remove(); });

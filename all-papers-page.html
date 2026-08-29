@@ -79,6 +79,29 @@
                     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  function displayLabels(labels) {
+    var sectionOrder = ['Travel', 'Culture', 'Business', 'Technology', 'Life', 'Ideas'];
+    var sectionSet = {}, seen = {}, unique = [];
+    sectionOrder.forEach(function (name) { sectionSet[name] = true; });
+    labels.forEach(function (name) {
+      if (name === 'Artificial Intelligence') name = 'AI';
+      if (!name || name === 'The Pwavwe Papers' || seen[name]) return;
+      seen[name] = true;
+      unique.push(name);
+    });
+    var primary = null;
+    sectionOrder.some(function (section) {
+      if (unique.indexOf(section) !== -1) { primary = section; return true; }
+      return false;
+    });
+    var topic = unique.filter(function (name) { return name !== primary && !sectionSet[name]; })[0] || null;
+    var chosen = [];
+    if (primary) chosen.push(primary);
+    if (topic) chosen.push(topic);
+    unique.forEach(function (name) { if (chosen.length < 2 && chosen.indexOf(name) === -1) chosen.push(name); });
+    return chosen;
+  }
+
   // Blogger caps each feed request at 150; paginate until we've got them all.
   function load(start) {
     fetch('/feeds/posts/default?alt=json&max-results=150&start-index=' + start)
@@ -90,7 +113,7 @@
         else { render(); }
       })
       .catch(function () {
-        body.innerHTML = '<p class="pi-status">Could not load the archive right now — please refresh.</p>';
+        body.innerHTML = '<p class="pi-status">Could not load the archive right now \u2014 please refresh.</p>';
       });
   }
 
@@ -124,9 +147,10 @@
         html += '<li class="pi-item" data-item data-search="' + esc(hay) + '">';
         html += '<a class="pi-link" href="' + esc(p.link) + '"><span>';
         html += '<span class="pi-title">' + esc(p.title) + '</span>';
-        if (p.labels.length) {
+        var shownLabels = displayLabels(p.labels);
+        if (shownLabels.length) {
           html += '<span class="pi-tags">';
-          p.labels.slice(0, 4).forEach(function (t) { html += '<span class="pi-tag">' + esc(t) + '</span>'; });
+          shownLabels.forEach(function (t) { html += '<span class="pi-tag">' + esc(t) + '</span>'; });
           html += '</span>';
         }
         html += '</span><span class="pi-date">' + dateStr + '</span></a></li>';
