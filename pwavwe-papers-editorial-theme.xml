@@ -34,7 +34,7 @@
 
   <!-- Restore saved colour theme before first paint (kills the dark-mode flash) -->
   <script>//<![CDATA[
-  (function(){try{var t=localStorage.getItem('pwavwe-theme');if(t==='dark'){document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=theme-color]');if(m){m.setAttribute('content','#131210');}}}catch(e){}})();
+  (function(){var t=null;try{t=localStorage.getItem('pwavwe-theme');}catch(e){}var d=t==='dark'||(t!=='light'&&!!window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.classList.add('dark');var m=document.querySelector('meta[name=theme-color]');if(m){m.setAttribute('content','#131210');}}})();
   //]]></script>
 
   <!-- Social cards (Twitter/X falls back to og: tags for image + url) -->
@@ -334,7 +334,15 @@ button, input { font: inherit; }
   margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
   color: var(--muted); font-size: .74rem; font-weight: 600;
 }
-.dot:before { content: '•'; margin-right: 8px; }
+.dot { display: inline-flex; align-items: center; gap: 8px; }
+.dot:before {
+  content: '';
+  width: 3px;
+  height: 3px;
+  flex: 0 0 3px;
+  border-radius: 50%;
+  background: currentColor;
+}
 .read-link { color: var(--ink); font-weight: 800; }
 .read-link:hover { color: var(--accent); }
 
@@ -382,6 +390,60 @@ button, input { font: inherit; }
   cursor: pointer;
 }
 .share-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+.article-main { min-width: 0; }
+.paper-audio {
+  margin: 0 0 36px; padding: clamp(16px, 3vw, 24px);
+  border: 1px solid var(--line); border-top: 3px solid var(--accent);
+  border-radius: 6px; background: var(--card);
+}
+.paper-audio[hidden] { display: none; }
+.paper-audio-heading {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: 8px 20px; margin-bottom: 16px;
+}
+.paper-audio-title { margin: 0 0 5px; font: 400 1.5rem/1.2 var(--serif); }
+.paper-audio-note { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.paper-audio-link {
+  color: var(--accent); font-size: .76rem; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.paper-audio-player > iframe {
+  display: block; width: 100% !important; max-width: 100%;
+  min-height: 166px; border: 0; border-radius: 3px;
+}
+/* AZ Studio player block. Posts may still carry their own copy of these
+   styles; the extra .post-content / .paper-audio-player scope wins over it. */
+.post-content .pwavwe-audio-embed,
+.paper-audio-player .pwavwe-audio-embed { --pwavwe-audio-h: 156px; margin: 1.75em 0; max-width: 760px; }
+@media (max-width: 576px) {
+  .post-content .pwavwe-audio-embed,
+  .paper-audio-player .pwavwe-audio-embed { --pwavwe-audio-h: 224px; }
+}
+@media (max-width: 312px) {
+  .post-content .pwavwe-audio-embed,
+  .paper-audio-player .pwavwe-audio-embed { --pwavwe-audio-h: 264px; }
+}
+.post-content .pwavwe-audio-embed iframe,
+.paper-audio-player .pwavwe-audio-embed iframe {
+  display: block; width: 100%; height: var(--pwavwe-audio-h);
+  border: 0; border-radius: 12px; overflow: hidden;
+}
+.post-content .pwavwe-audio-embed p { margin: .45em 0 0; }
+.post-content .pwavwe-audio-open {
+  font-family: var(--sans); font-size: .78em; color: inherit; opacity: .68;
+  text-decoration: underline; text-underline-offset: .2em;
+}
+.post-content .pwavwe-audio-open:hover,
+.post-content .pwavwe-audio-open:focus { opacity: 1; }
+/* Inside the panel, the heading's Open audio link replaces the block's own. */
+.paper-audio-player .pwavwe-audio-embed { margin: 0 !important; max-width: none !important; }
+.paper-audio-player .pwavwe-audio-embed p { display: none; }
+.paper-audio-credit {
+  margin-top: 10px; color: var(--muted); font: .7rem/1.5 var(--sans);
+  overflow-wrap: anywhere;
+}
+.paper-audio-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
 .post-content {
   font-family: Georgia, 'Times New Roman', serif;
@@ -913,7 +975,16 @@ summary:focus-visible,
                    reword it without editing the theme. An empty Description falls
                    back to the static line below. -->
               <b:section class='masthead-headline' id='mastheadHeadline' maxwidgets='1' showaddelement='no'>
-                <b:widget id='Header1' locked='true' title='Masthead headline (blog Description)' type='Header' version='2'>
+                <b:widget id='Header1' locked='true' title='The Pwavwe Papers (Header)' type='Header' version='2' visible='true'>
+                  <b:widget-settings>
+                    <b:widget-setting name='displayUrl'/>
+                    <b:widget-setting name='displayHeight'>0</b:widget-setting>
+                    <b:widget-setting name='sectionWidth'>-1</b:widget-setting>
+                    <b:widget-setting name='useImage'>false</b:widget-setting>
+                    <b:widget-setting name='shrinkToFit'>false</b:widget-setting>
+                    <b:widget-setting name='imagePlacement'>BEHIND</b:widget-setting>
+                    <b:widget-setting name='displayWidth'>0</b:widget-setting>
+                  </b:widget-settings>
                   <b:includable id='main'>
                     <b:if cond='data:description != &quot;&quot;'>
                       <h1><data:description/></h1>
@@ -943,6 +1014,25 @@ summary:focus-visible,
     <main>
       <b:section class='main' id='main' maxwidgets='1' showaddelement='no'>
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' version='1'>
+          <b:widget-settings>
+            <b:widget-setting name='showDateHeader'>true</b:widget-setting>
+            <b:widget-setting name='showShareButtons'>true</b:widget-setting>
+            <b:widget-setting name='authorLabel'>By</b:widget-setting>
+            <b:widget-setting name='showCommentLink'>true</b:widget-setting>
+            <b:widget-setting name='showAuthor'>false</b:widget-setting>
+            <b:widget-setting name='style.unittype'>TextAndImage</b:widget-setting>
+            <b:widget-setting name='timestampLabel'>-</b:widget-setting>
+            <b:widget-setting name='reactionsLabel'/>
+            <b:widget-setting name='showAuthorProfile'>false</b:widget-setting>
+            <b:widget-setting name='style.layout'>1x1</b:widget-setting>
+            <b:widget-setting name='showLabels'>true</b:widget-setting>
+            <b:widget-setting name='showLocation'>true</b:widget-setting>
+            <b:widget-setting name='showTimestamp'>true</b:widget-setting>
+            <b:widget-setting name='postsPerAd'>1</b:widget-setting>
+            <b:widget-setting name='showBacklinks'>false</b:widget-setting>
+            <b:widget-setting name='showInlineAds'>false</b:widget-setting>
+            <b:widget-setting name='showReactions'>false</b:widget-setting>
+          </b:widget-settings>
           <b:includable id='main'>
             <b:if cond='data:blog.pageType == &quot;error_page&quot;'>
               <section class='index-section'>
@@ -1067,8 +1157,20 @@ summary:focus-visible,
                   </div>
                 </aside>
 
-                <div class='post-content' expr:data-post-title='data:post.title' id='postContent' itemprop='articleBody'>
-                  <data:post.body/>
+                <div class='article-main'>
+                  <section aria-labelledby='paperAudioTitle' class='paper-audio' hidden='hidden' id='paperAudio'>
+                    <div class='paper-audio-heading'>
+                      <div>
+                        <p class='paper-audio-title' id='paperAudioTitle'>Listen to this paper</p>
+                        <p class='paper-audio-note'>In Francis Pwavwe&#8217;s voice.</p>
+                      </div>
+                      <a aria-label='Open audio in a new tab' class='paper-audio-link' id='paperAudioLink' rel='noopener' target='_blank'>Open audio</a>
+                    </div>
+                    <div class='paper-audio-player' id='paperAudioPlayer'></div>
+                  </section>
+                  <div class='post-content' expr:data-post-title='data:post.title' id='postContent' itemprop='articleBody'>
+                    <data:post.body/>
+                  </div>
                 </div>
 
                 <aside class='article-aside'>
@@ -1234,15 +1336,32 @@ summary:focus-visible,
 (function () {
   var root = document.documentElement;
   var themeToggle = document.getElementById('themeToggle');
-  // Initial dark class is set by the inline <head> script to avoid a flash.
+  // Initial dark class is set by the inline <head> script to avoid a flash:
+  // the reader's saved choice, otherwise their system setting.
+  function setDark(isDark) {
+    root.classList.toggle('dark', isDark);
+    var meta = document.querySelector('meta[name=theme-color]');
+    if (meta) meta.setAttribute('content', isDark ? '#131210' : '#f7f4ee');
+  }
 
   if (themeToggle) {
     themeToggle.addEventListener('click', function () {
-      var isDark = root.classList.toggle('dark');
+      var isDark = !root.classList.contains('dark');
+      setDark(isDark);
       try { localStorage.setItem('pwavwe-theme', isDark ? 'dark' : 'light'); } catch (e) {}
-      var meta = document.querySelector('meta[name=theme-color]');
-      if (meta) meta.setAttribute('content', isDark ? '#131210' : '#f7f4ee');
     });
+  }
+
+  // Until the reader picks a theme here, follow system changes live.
+  if (window.matchMedia) {
+    var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+    var followSystem = function (e) {
+      var saved = null;
+      try { saved = localStorage.getItem('pwavwe-theme'); } catch (err) {}
+      if (saved !== 'dark' && saved !== 'light') setDark(e.matches);
+    };
+    if (systemDark.addEventListener) systemDark.addEventListener('change', followSystem);
+    else if (systemDark.addListener) systemDark.addListener(followSystem);
   }
 
   var menuToggle = document.getElementById('menuToggle');
@@ -1456,19 +1575,114 @@ summary:focus-visible,
         frame.setAttribute('loading', 'lazy');
         if (!frame.getAttribute('title')) frame.setAttribute('title', 'Blogger comments');
       });
-      Array.prototype.forEach.call(fragment.querySelectorAll('script'), function (oldScript) {
-        var script = document.createElement('script');
-        Array.prototype.forEach.call(oldScript.attributes, function (attr) { script.setAttribute(attr.name, attr.value); });
-        script.text = oldScript.textContent || '';
-        oldScript.parentNode.replaceChild(script, oldScript);
+      // Scripts cloned from a template are inert. Run them in document order,
+      // waiting for each external dependency before the following inline script.
+      // Blogger's iframe initializer otherwise runs before its library is ready,
+      // leaving a blank comment box that cannot receive input.
+      var scripts = Array.prototype.map.call(fragment.querySelectorAll('script'), function (oldScript) {
+        var descriptor = {attributes: [], text: oldScript.textContent || ''};
+        Array.prototype.forEach.call(oldScript.attributes, function (attr) {
+          descriptor.attributes.push({name: attr.name, value: attr.value});
+        });
+        oldScript.parentNode.removeChild(oldScript);
+        return descriptor;
       });
       commentsMount.appendChild(fragment);
       commentsTemplate.remove();
+
+      function runCommentScript(index) {
+        if (index >= scripts.length) return;
+        var descriptor = scripts[index];
+        var script = document.createElement('script');
+        Array.prototype.forEach.call(descriptor.attributes, function (attr) {
+          script.setAttribute(attr.name, attr.value);
+        });
+        if (script.src) {
+          script.onload = function () { runCommentScript(index + 1); };
+          script.onerror = function () { runCommentScript(index + 1); };
+        } else {
+          script.text = descriptor.text;
+        }
+        commentsMount.appendChild(script);
+        if (!script.src) runCommentScript(index + 1);
+      }
+
+      runCommentScript(0);
     });
   }
 
   var content = document.getElementById('postContent');
   if (content) {
+    // The first AZ Studio or SoundCloud embed is the paper's read version. For
+    // SoundCloud, keep its original track URL (including any secret token) and
+    // the chosen player height.
+    var paperAudio = null;
+    (function preparePaperAudio() {
+      var audio = document.getElementById('paperAudio');
+      var mount = document.getElementById('paperAudioPlayer');
+      var link = document.getElementById('paperAudioLink');
+      if (!audio || !mount || !link) return;
+      var frames = content.querySelectorAll('iframe[src]');
+      for (var i = 0; i < frames.length; i++) {
+        var frame = frames[i];
+        var playerUrl;
+        try { playerUrl = new URL(frame.getAttribute('src'), window.location.href); }
+        catch (e) { continue; }
+
+        // AZ Studio embeds are a self-contained block. Move the whole block so
+        // its styles travel with it; the audio script below themes and sizes it.
+        var embed = frame.closest('.pwavwe-audio-embed');
+        if (embed && playerUrl.origin === 'https://az-studio.web.app' && /^\/embed\/audio\/[\w-]+\/?$/.test(playerUrl.pathname)) {
+          var openUrl = new URL(playerUrl.href);
+          openUrl.searchParams.set('theme', 'auto');
+          link.href = openUrl.href;
+          playerUrl.searchParams.delete('theme');
+          paperAudio = { embedUrl: playerUrl.href, url: playerUrl.href };
+          mount.appendChild(embed);
+          audio.hidden = false;
+          break;
+        }
+
+        if (playerUrl.hostname !== 'w.soundcloud.com' || !/^\/player\/?$/.test(playerUrl.pathname)) continue;
+        if (!/^https?:$/.test(playerUrl.protocol) || !playerUrl.searchParams.get('url')) continue;
+        playerUrl.protocol = 'https:';
+        playerUrl.searchParams.set('auto_play', 'false');
+        frame.setAttribute('src', playerUrl.href);
+        frame.setAttribute('title', 'Listen to ' + (content.getAttribute('data-post-title') || 'this paper') + ' on SoundCloud');
+        frame.setAttribute('loading', 'lazy');
+        frame.setAttribute('width', '100%');
+        link.href = playerUrl.href;
+        function soundCloudLink(value) {
+          try {
+            var url = new URL(value);
+            if (url.protocol === 'https:' && /^(www\.)?soundcloud\.com$/.test(url.hostname)) return url.href;
+          } catch (e) {}
+          return '';
+        }
+        var trackLink = soundCloudLink(playerUrl.searchParams.get('url'));
+        if (trackLink) link.href = trackLink;
+
+        // SoundCloud's copied code often includes a small attribution div.
+        // Keep it with the player, without moving neighbouring article prose.
+        var credit = frame.nextElementSibling;
+        if (credit && credit.tagName === 'DIV' && /font-size\s*:\s*10px/i.test(credit.getAttribute('style') || '')) {
+          var creditLinks = Array.prototype.slice.call(credit.querySelectorAll('a[href]'));
+          if (creditLinks.length && creditLinks.every(function (a) { return !!soundCloudLink(a.href); })) {
+            credit.removeAttribute('style');
+            credit.classList.add('paper-audio-credit');
+            creditLinks.forEach(function (a) { a.removeAttribute('style'); });
+            link.href = creditLinks[creditLinks.length - 1].href;
+            mount.appendChild(frame);
+            mount.appendChild(credit);
+          }
+        }
+        if (!mount.contains(frame)) mount.appendChild(frame);
+        paperAudio = { embedUrl: playerUrl.href, url: link.href };
+        audio.hidden = false;
+        break;
+      }
+    })();
+
     Array.prototype.forEach.call(content.querySelectorAll('img'), function (image) {
       image.setAttribute('loading', 'lazy');
       image.setAttribute('decoding', 'async');
@@ -1506,6 +1720,15 @@ summary:focus-visible,
       if (image) post.image = image;
       if (published) post.datePublished = published;
       if (modified) post.dateModified = modified;
+      if (paperAudio) {
+        post.audio = {
+          '@type': 'AudioObject',
+          name: title + ' (audio edition)',
+          embedUrl: paperAudio.embedUrl,
+          url: paperAudio.url,
+          inLanguage: 'en'
+        };
+      }
 
       var crumbs = [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://blogs.pwavwe.com/' }];
       var firstLabel = document.querySelector('.article-kicker a');
@@ -1613,6 +1836,47 @@ summary:focus-visible,
     }
 
   }
+})();
+//]]>
+</script>
+<script>
+//<![CDATA[
+/* The Pwavwe Papers audio player: keep embedded players on the blog's theme, and size them to their content. */
+(function () {
+  var ORIGIN = "https://az-studio.web.app";
+  function frames() { return document.querySelectorAll('.pwavwe-audio-embed iframe'); }
+  function currentTheme() { return document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
+  function send() {
+    var theme = currentTheme();
+    Array.prototype.forEach.call(frames(), function (f) {
+      if (f.contentWindow) f.contentWindow.postMessage({ type: 'pwavwe-player-theme', theme: theme }, ORIGIN);
+    });
+  }
+  window.addEventListener('message', function (e) {
+    if (e.origin !== ORIGIN || !e.data || e.data.type !== 'pwavwe-player-size') return;
+    var h = Number(e.data.height);
+    if (h > 0 && h <= 600) {
+      Array.prototype.forEach.call(frames(), function (f) {
+        if (f.contentWindow === e.source) f.style.height = Math.round(h) + 'px';
+      });
+    }
+    send();
+  });
+  // Posts embed the player as ?theme=light. Match the reader's theme in the URL
+  // so a lazy-loaded player starts in the right colours instead of flashing light.
+  // Embeds can finish loading after window load, so theme each one as it arrives.
+  Array.prototype.forEach.call(frames(), function (f) {
+    try {
+      var url = new URL(f.getAttribute('src'), window.location.href);
+      if (url.origin === ORIGIN && url.searchParams.get('theme') !== currentTheme()) {
+        url.searchParams.set('theme', currentTheme());
+        f.setAttribute('src', url.href);
+      }
+    } catch (e) {}
+    f.addEventListener('load', send);
+  });
+  new MutationObserver(send).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  window.addEventListener('load', send);
 })();
 //]]>
 </script>

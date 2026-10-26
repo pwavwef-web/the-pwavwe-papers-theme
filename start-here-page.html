@@ -38,7 +38,7 @@
 .sh-intro a { color: var(--accent); text-decoration: none; }
 .sh-intro a:hover { text-decoration: underline; }
 
-.sh-h2 {
+.start-here .sh-h2 {
   font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
   font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.1; color: var(--ink);
   margin: 46px 0 6px;
@@ -72,8 +72,16 @@
 .sh-cluster h3 a:hover { color: var(--accent); }
 .sh-cluster-blurb { margin: 0 0 14px; color: var(--muted); font-size: .9rem; line-height: 1.6; }
 .sh-cluster-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
-.sh-cluster-list a { color: var(--ink); text-decoration: none; font-size: .95rem; line-height: 1.4; display: block; }
-.sh-cluster-list a:before { content: '\2192'; color: var(--accent); margin-right: 8px; }
+.sh-cluster-list a { color: var(--ink); text-decoration: none; font-size: .95rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; }
+.sh-cluster-list a:before {
+  content: '';
+  width: 11px;
+  height: 8px;
+  flex: 0 0 11px;
+  margin-top: .38em;
+  background: var(--accent);
+  clip-path: polygon(0 43%, 64% 43%, 64% 0, 100% 50%, 64% 100%, 64% 57%, 0 57%);
+}
 .sh-cluster-list a:hover { color: var(--accent); }
 .sh-cluster-more { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
 .sh-cluster-more:hover { text-decoration: underline; }
@@ -158,11 +166,11 @@
   // ---- Topic clusters. label must match a Blogger label exactly. A cluster
   //      whose label has no posts hides itself, so extras are harmless. ----
   var CLUSTERS = [
-    { label: 'Technology', title: 'Technology',   blurb: 'What a piece of tech actually changes \u2014 beyond the hype cycle.' },
+    { label: 'Technology', title: 'Technology',   blurb: 'What a piece of tech actually changes, beyond the hype cycle.' },
     { label: 'Business',   title: 'Business',     blurb: 'Ideas and models worth stress-testing, from someone who builds.' },
     { label: 'Ideas',      title: 'Ideas',        blurb: 'The essays that are really just a good question, followed all the way down.' },
     { label: 'Ghana',      title: 'Ghana',        blurb: 'Student life, graduate life, and the view from Accra and Cape Coast.' },
-    { label: 'Philosophy', title: 'Philosophy',   blurb: 'Belief, doubt and the big questions \u2014 argued honestly, not settled.' },
+    { label: 'Philosophy', title: 'Philosophy',   blurb: 'Belief, doubt and the big questions, argued honestly, not settled.' },
     { label: 'Travel',     title: 'Travel',       blurb: 'Where the industry is genuinely headed, and the pleasure of going.' }
   ];
 
