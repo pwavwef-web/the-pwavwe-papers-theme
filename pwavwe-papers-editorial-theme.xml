@@ -174,6 +174,18 @@ button, input { font: inherit; }
 .site-shell { min-height: 100vh; }
 .wrap { width: min(calc(100% - 40px), var(--max)); margin: 0 auto; }
 
+/* Keyboard users can jump past the header; hidden until focused. */
+.skip-link {
+  position: fixed; left: 12px; top: 12px; z-index: 3000;
+  padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--paper);
+  font-size: .82rem; font-weight: 800; transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
 /* Reading progress */
 .reading-progress {
   position: fixed; inset: 0 auto auto 0; z-index: 2000;
@@ -378,9 +390,20 @@ button, input { font: inherit; }
   display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px;
   color: var(--muted); font-size: .78rem; font-weight: 650;
 }
-.article-hero { width: min(calc(100% - 40px), 1180px); margin: 38px auto 56px; }
+/* A listened-to paper: small chip in the byline that jumps to the player. */
+.byline-audio {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 30px;
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px 4px 9px;
+  background: var(--card); color: var(--accent); font-weight: 750;
+}
+.byline-audio:hover { border-color: var(--accent); }
+.byline-audio svg {
+  width: 14px; height: 14px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.article-hero { width: min(calc(100% - 40px), 900px); margin: 34px auto 48px; }
 .article-hero img {
-  width: 100%; height: auto; max-height: 760px; aspect-ratio: 16 / 9; object-fit: cover;
+  width: 100%; height: auto; max-height: 560px; aspect-ratio: 16 / 9; object-fit: cover;
   background: var(--paper-2);
 }
 /* The lead photo's credit, moved here from the post body by the script. */
@@ -390,17 +413,33 @@ button, input { font: inherit; }
 }
 .article-hero-caption a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .article-hero-caption a:hover { color: var(--accent); }
+/* Three tracks: contents rail, reading column, share rail. The 1160px frame
+   lets the column reach the full 760px measure, matching the blocks below it. */
 .article-layout {
-  width: min(calc(100% - 40px), 1120px); margin: 0 auto;
+  width: min(calc(100% - 40px), 1160px); margin: 0 auto;
   display: grid; grid-template-columns: 160px minmax(0,var(--reading)) 160px;
   justify-content: center; gap: 40px;
+}
+/* Between tablet and wide desktop, slim the rails instead of the column. */
+@media (min-width: 981px) and (max-width: 1216px) {
+  .article-layout { grid-template-columns: 120px minmax(0,var(--reading)) 120px; gap: 28px; }
 }
 .article-aside { position: relative; }
 .sticky-box { position: sticky; top: 105px; }
 .aside-title { margin: 0 0 12px; color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.toc { display: grid; gap: 9px; }
-.toc a { color: var(--muted); font-size: .74rem; line-height: 1.35; }
+.toc { display: grid; gap: 2px; border-left: 1px solid var(--line); }
+.toc a {
+  display: block; margin-left: -1px; padding: 4px 0 4px 12px;
+  border-left: 2px solid transparent;
+  color: var(--muted); font-size: .74rem; line-height: 1.35;
+}
+.toc a.toc-sub { padding-left: 22px; }
 .toc a:hover { color: var(--accent); }
+.toc a.is-active { border-left-color: var(--accent); color: var(--ink); font-weight: 700; }
+.toc.toc--empty { border-left: 0; }
+.toc-empty { color: var(--muted); font-size: .72rem; line-height: 1.4; }
+/* Contents for phones and tablets, where the rail is hidden. */
+.toc-mobile { display: none; }
 .share-stack { display: grid; gap: 8px; }
 .share-btn {
   border: 1px solid var(--line); background: var(--card); color: var(--ink);
@@ -408,22 +447,29 @@ button, input { font: inherit; }
   cursor: pointer;
 }
 .share-btn:hover { color: var(--accent); border-color: var(--accent); }
+/* Share row under the author box, for screens without the share rail. */
+.share-row { display: none; }
 
 .article-main { min-width: 0; }
+/* Audio edition: one strip of chrome above the player, which carries its own title. */
 .paper-audio {
-  margin: 0 0 36px; padding: clamp(16px, 3vw, 24px);
-  border: 1px solid var(--line); border-top: 3px solid var(--accent);
-  border-radius: 6px; background: var(--card);
+  margin: 0 0 32px; padding: 12px 0 18px;
+  border-top: 3px solid var(--accent); border-bottom: 1px solid var(--line);
+  scroll-margin-top: 100px;
 }
 .paper-audio[hidden] { display: none; }
 .paper-audio-heading {
   display: flex; flex-wrap: wrap; align-items: baseline;
-  justify-content: space-between; gap: 8px 20px; margin-bottom: 16px;
+  justify-content: space-between; gap: 4px 16px; margin-bottom: 12px;
 }
-.paper-audio-title { margin: 0 0 5px; font: 400 1.5rem/1.2 var(--serif); }
-.paper-audio-note { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.paper-audio-title {
+  margin: 0; color: var(--accent); font: 800 .7rem/1.5 var(--sans);
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.paper-audio-note { color: var(--muted); font-weight: 650; letter-spacing: .02em; text-transform: none; }
+.paper-audio-note:before { content: '\00b7'; margin: 0 8px; color: var(--muted); }
 .paper-audio-link {
-  color: var(--accent); font-size: .76rem; font-weight: 700;
+  color: var(--accent); font-size: .74rem; font-weight: 700;
   text-decoration: underline; text-underline-offset: 3px;
 }
 .paper-audio-player > iframe {
@@ -470,17 +516,22 @@ button, input { font: inherit; }
 }
 .post-content > *:first-child { margin-top: 0; }
 .post-content p { margin: 0 0 1.5em; }
+/* Opening paragraph, marked by the script. */
+.post-content p.lede { font-size: 1.08em; line-height: 1.8; }
+/* Headings sit on one scale with the body (about 1.5x), not 3x. */
 .post-content h2, .post-content h3, .post-content h4 {
-  font-family: var(--serif); font-weight: 400; line-height: 1.04; letter-spacing: -.015em;
-  scroll-margin-top: 110px;
+  font-family: var(--serif); font-weight: 400; line-height: 1.12; letter-spacing: -.01em;
+  scroll-margin-top: 110px; text-wrap: balance;
 }
-.post-content h2 { margin: 2em 0 .72em; font-size: clamp(2rem, 5vw, 3.5rem); }
-.post-content h3 { margin: 1.8em 0 .7em; font-size: clamp(1.5rem, 3.6vw, 2.35rem); }
+.post-content h2 { margin: 2.2em 0 .6em; font-size: clamp(1.7rem, 2.4vw, 2.25rem); }
+.post-content h3 { margin: 1.9em 0 .55em; font-size: clamp(1.35rem, 1.9vw, 1.65rem); }
+.post-content h4 { margin: 1.7em 0 .5em; font-size: 1.15em; }
 .post-content a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .post-content blockquote {
-  margin: 2.3em 0; padding: .15em 0 .15em 1em; border-left: 4px solid var(--accent);
-  font-family: var(--serif); font-size: clamp(1.6rem, 4vw, 2.55rem); line-height: 1.15;
+  margin: 2em 0; padding: .1em 0 .1em 1em; border-left: 3px solid var(--accent);
+  font-family: var(--serif); font-size: clamp(1.3rem, 2.2vw, 1.7rem); line-height: 1.3;
 }
+.post-content blockquote p:last-child { margin-bottom: 0; }
 .post-content img { margin: 2em auto; max-height: 780px; object-fit: contain; }
 .post-content figure { margin: 2em 0; }
 .post-content figcaption { color: var(--muted); font: .75rem/1.5 var(--sans); text-align: center; }
@@ -874,6 +925,28 @@ button, input { font: inherit; }
   .post-card:first-child .post-card-media { order: 0; }
   .article-layout { grid-template-columns: minmax(0,var(--reading)); }
   .article-aside { display: none; }
+  .toc-mobile:not([hidden]) {
+    display: block; margin: 0 0 30px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+  }
+  .toc-mobile summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 14px 18px; cursor: pointer; list-style: none;
+    color: var(--ink); font-size: .88rem; font-weight: 800;
+  }
+  .toc-mobile summary::-webkit-details-marker { display: none; }
+  .toc-mobile summary span { color: var(--muted); font-size: .72rem; font-weight: 650; }
+  .toc-mobile summary span:after { content: ' +'; color: var(--accent); font-weight: 800; }
+  .toc-mobile[open] summary span:after { content: ' \2013'; }
+  .toc-mobile[open] summary { border-bottom: 1px solid var(--line); }
+  .toc-mobile .toc { margin: 14px 18px 16px; }
+  .toc-mobile .toc a { padding-top: 7px; padding-bottom: 7px; font-size: .9rem; }
+  .share-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; }
+  .share-row-label {
+    margin-right: 4px; color: var(--muted); font-size: .66rem; font-weight: 800;
+    letter-spacing: .12em; text-transform: uppercase;
+  }
+  .share-row .share-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 15px; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-grid > :first-child { grid-column: 1 / -1; }
 }
@@ -928,6 +1001,7 @@ summary:focus-visible,
 </head>
 
 <body>
+  <a class='skip-link' href='#main'>Skip to content</a>
   <div class='reading-progress' id='readingProgress'></div>
   <div class='site-shell'>
 
@@ -1180,7 +1254,7 @@ summary:focus-visible,
 
               <b:if cond='data:post.firstImageUrl'>
                 <figure class='article-hero'>
-                  <img decoding='async' expr:alt='data:post.title' expr:src='resizeImage(data:post.firstImageUrl, 1200, &quot;16:9&quot;)' expr:srcset='resizeImage(data:post.firstImageUrl, 640, &quot;16:9&quot;) + &quot; 640w, &quot; + resizeImage(data:post.firstImageUrl, 960, &quot;16:9&quot;) + &quot; 960w, &quot; + resizeImage(data:post.firstImageUrl, 1200, &quot;16:9&quot;) + &quot; 1200w, &quot; + resizeImage(data:post.firstImageUrl, 1600, &quot;16:9&quot;) + &quot; 1600w&quot;' fetchpriority='high' height='900' itemprop='image' sizes='(max-width: 640px) calc(100vw - 28px), (max-width: 1220px) calc(100vw - 40px), 1180px' width='1600'/>
+                  <img decoding='async' expr:alt='data:post.title' expr:src='resizeImage(data:post.firstImageUrl, 1200, &quot;16:9&quot;)' expr:srcset='resizeImage(data:post.firstImageUrl, 640, &quot;16:9&quot;) + &quot; 640w, &quot; + resizeImage(data:post.firstImageUrl, 960, &quot;16:9&quot;) + &quot; 960w, &quot; + resizeImage(data:post.firstImageUrl, 1200, &quot;16:9&quot;) + &quot; 1200w, &quot; + resizeImage(data:post.firstImageUrl, 1600, &quot;16:9&quot;) + &quot; 1600w&quot;' fetchpriority='high' height='900' itemprop='image' sizes='(max-width: 640px) calc(100vw - 28px), (max-width: 940px) calc(100vw - 40px), 900px' width='1600'/>
                 </figure>
               </b:if>
 
@@ -1195,14 +1269,17 @@ summary:focus-visible,
                 <div class='article-main'>
                   <section aria-labelledby='paperAudioTitle' class='paper-audio' hidden='hidden' id='paperAudio'>
                     <div class='paper-audio-heading'>
-                      <div>
-                        <p class='paper-audio-title' id='paperAudioTitle'>Listen to this paper</p>
-                        <p class='paper-audio-note'>In Francis Pwavwe&#8217;s voice.</p>
-                      </div>
-                      <a aria-label='Open audio in a new tab' class='paper-audio-link' id='paperAudioLink' rel='noopener' target='_blank'>Open audio</a>
+                      <p class='paper-audio-title'><span id='paperAudioTitle'>Audio edition</span><span class='paper-audio-note'>In Francis Pwavwe&#8217;s voice</span></p>
+                      <a aria-label='Open audio in a new tab' class='paper-audio-link' id='paperAudioLink' rel='noopener' target='_blank'>Open audio &#8599;</a>
                     </div>
                     <div class='paper-audio-player' id='paperAudioPlayer'></div>
                   </section>
+                  <b:if cond='data:blog.pageType == &quot;item&quot;'>
+                    <details class='toc-mobile' hidden='hidden' id='tocMobile'>
+                      <summary>On this page <span class='toc-count'/></summary>
+                      <nav aria-label='Table of contents' class='toc' id='tocMobileNav'></nav>
+                    </details>
+                  </b:if>
                   <div class='post-content' expr:data-post-title='data:post.title' id='postContent' itemprop='articleBody'>
                     <data:post.body/>
                   </div>
@@ -1212,11 +1289,11 @@ summary:focus-visible,
                   <div class='sticky-box'>
                     <div class='aside-title'>Share paper</div>
                     <div class='share-stack'>
-                      <button class='share-btn' id='copyLink' type='button'>Copy link</button>
-                      <a class='share-btn' id='shareX' rel='noopener' target='_blank'>X</a>
-                      <a class='share-btn' id='shareLinkedIn' rel='noopener' target='_blank'>LinkedIn</a>
-                      <a class='share-btn' id='shareWhatsApp' rel='noopener' target='_blank'>WhatsApp</a>
-                      <a class='share-btn' id='shareFacebook' rel='noopener' target='_blank'>Facebook</a>
+                      <button aria-label='Copy link to this paper' class='share-btn' data-share='copy' type='button'>Copy link</button>
+                      <a aria-label='Share on X' class='share-btn' data-share='x' rel='noopener' target='_blank'>X</a>
+                      <a aria-label='Share on LinkedIn' class='share-btn' data-share='linkedin' rel='noopener' target='_blank'>LinkedIn</a>
+                      <a aria-label='Share on WhatsApp' class='share-btn' data-share='whatsapp' rel='noopener' target='_blank'>WhatsApp</a>
+                      <a aria-label='Share on Facebook' class='share-btn' data-share='facebook' rel='noopener' target='_blank'>Facebook</a>
                     </div>
                   </div>
                 </aside>
@@ -1231,6 +1308,17 @@ summary:focus-visible,
                     <link href='https://pwavwe.com' itemprop='url'/>
                   </div>
                 </div>
+                <b:if cond='data:blog.pageType == &quot;item&quot;'>
+                  <div aria-label='Share this paper' class='share-row' role='group'>
+                    <span aria-hidden='true' class='share-row-label'>Share</span>
+                    <button aria-label='Copy link to this paper' class='share-btn' data-share='copy' type='button'>Copy link</button>
+                    <a aria-label='Share on X' class='share-btn' data-share='x' rel='noopener' target='_blank'>X</a>
+                    <a aria-label='Share on LinkedIn' class='share-btn' data-share='linkedin' rel='noopener' target='_blank'>LinkedIn</a>
+                    <a aria-label='Share on WhatsApp' class='share-btn' data-share='whatsapp' rel='noopener' target='_blank'>WhatsApp</a>
+                    <a aria-label='Share on Facebook' class='share-btn' data-share='facebook' rel='noopener' target='_blank'>Facebook</a>
+                  </div>
+                  <p aria-live='polite' class='visually-hidden' id='shareStatus'/>
+                </b:if>
               </footer>
 
               <b:if cond='data:blog.pageType == &quot;item&quot;'>
@@ -1821,6 +1909,28 @@ summary:focus-visible,
       else dek.remove();
     }
 
+    // Say in the byline that the paper can be heard, linking to the player.
+    var byline = document.querySelector('.article-byline');
+    if (paperAudio && byline) {
+      var listen = document.createElement('a');
+      listen.className = 'byline-audio';
+      listen.href = '#paperAudio';
+      listen.innerHTML = '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="5" height="7" rx="2"/><rect x="16" y="14" width="5" height="7" rx="2"/></svg><span>Listen instead</span>';
+      byline.appendChild(listen);
+    }
+
+    // The opening paragraph is set slightly larger to ease the reader in.
+    (function markLede() {
+      var paragraphs = content.querySelectorAll('p');
+      for (var i = 0; i < paragraphs.length; i++) {
+        var p = paragraphs[i];
+        if (p.closest('figure, blockquote, li, table, .pwavwe-audio-embed')) continue;
+        if ((p.textContent || '').trim().length < 60 || !p.getClientRects().length) continue;
+        p.classList.add('lede');
+        break;
+      }
+    })();
+
     Array.prototype.forEach.call(content.querySelectorAll('img'), function (image) {
       image.setAttribute('loading', 'lazy');
       image.setAttribute('decoding', 'async');
@@ -1884,55 +1994,114 @@ summary:focus-visible,
       });
     })();
 
-    var headings = content.querySelectorAll('h2, h3');
-    var toc = document.getElementById('toc');
-    if (toc && headings.length > 1) {
+    // Contents: one heading list feeds the desktop rail and the phone/tablet
+    // panel, and the entry for the section being read is highlighted.
+    var headings = Array.prototype.filter.call(content.querySelectorAll('h2, h3'), function (h) {
+      return (h.textContent || '').trim() && h.getClientRects().length;
+    });
+    var tocNavs = ['toc', 'tocMobileNav'].map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    var tocEntries = [];
+    if (headings.length > 1) {
       headings.forEach(function (h, i) {
         if (!h.id) h.id = 'section-' + (i + 1);
-        var a = document.createElement('a');
-        a.href = '#' + h.id;
-        a.textContent = h.textContent;
-        if (h.tagName.toLowerCase() === 'h3') a.style.paddingLeft = '10px';
-        toc.appendChild(a);
+        tocEntries.push({ heading: h, links: tocNavs.map(function (nav) {
+          var a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent.trim();
+          if (h.tagName === 'H3') a.className = 'toc-sub';
+          nav.appendChild(a);
+          return a;
+        }) });
       });
-    } else if (toc) {
-      toc.innerHTML = '<span style="color:var(--muted);font-size:.72rem">A clean, uninterrupted read.</span>';
+      var tocMobile = document.getElementById('tocMobile');
+      if (tocMobile) {
+        var tocCount = tocMobile.querySelector('.toc-count');
+        if (tocCount) tocCount.textContent = headings.length + ' sections';
+        tocMobile.hidden = false;
+        tocMobile.addEventListener('click', function (e) {
+          if (e.target.closest && e.target.closest('a')) tocMobile.open = false;
+        });
+      }
+    } else {
+      var railToc = document.getElementById('toc');
+      if (railToc) {
+        railToc.classList.add('toc--empty');
+        railToc.innerHTML = '<span class="toc-empty">A clean, uninterrupted read.</span>';
+      }
     }
 
     var progress = document.getElementById('readingProgress');
-    function updateProgress() {
-      if (!progress) return;
-      var articleTop = content.getBoundingClientRect().top + window.scrollY;
-      var articleHeight = content.offsetHeight;
+    var activeEntry = null;
+    function updateReading() {
       var viewport = window.innerHeight;
-      var total = Math.max(1, articleHeight - viewport * 0.45);
-      var current = window.scrollY - articleTop + viewport * 0.2;
-      var pct = Math.min(100, Math.max(0, (current / total) * 100));
-      progress.style.width = pct + '%';
-    }
-    updateProgress();
-    window.addEventListener('scroll', updateProgress, {passive:true});
-
-    var url = encodeURIComponent(window.location.href);
-    var shareTitle = content.getAttribute('data-post-title') || document.title;
-    var title = encodeURIComponent(shareTitle);
-    var x = document.getElementById('shareX');
-    var li = document.getElementById('shareLinkedIn');
-    var wa = document.getElementById('shareWhatsApp');
-    var fb = document.getElementById('shareFacebook');
-    if (x) x.href = 'https://twitter.com/intent/tweet?url=' + url + '&text=' + title;
-    if (li) li.href = 'https://www.linkedin.com/sharing/share-offsite/?url=' + url;
-    if (wa) wa.href = 'https://wa.me/?text=' + title + '%20' + url;
-    if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
-
-    var copy = document.getElementById('copyLink');
-    if (copy) copy.addEventListener('click', function () {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(window.location.href).then(function(){
-          copy.textContent = 'Copied ✓';
-          setTimeout(function(){ copy.textContent = 'Copy link'; }, 1600);
-        });
+      if (progress) {
+        var articleTop = content.getBoundingClientRect().top + window.scrollY;
+        var total = Math.max(1, content.offsetHeight - viewport * 0.45);
+        var current = window.scrollY - articleTop + viewport * 0.2;
+        progress.style.width = Math.min(100, Math.max(0, (current / total) * 100)) + '%';
       }
+      if (!tocEntries.length) return;
+      var next = null;
+      for (var i = 0; i < tocEntries.length; i++) {
+        if (tocEntries[i].heading.getBoundingClientRect().top - 140 > 0) break;
+        next = tocEntries[i];
+      }
+      if (next === activeEntry) return;
+      if (activeEntry) activeEntry.links.forEach(function (a) { a.classList.remove('is-active'); a.removeAttribute('aria-current'); });
+      activeEntry = next;
+      if (activeEntry) activeEntry.links.forEach(function (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'location'); });
+    }
+    var readingFrame = 0;
+    function scheduleReading() {
+      if (readingFrame) return;
+      readingFrame = window.requestAnimationFrame(function () { readingFrame = 0; updateReading(); });
+    }
+    updateReading();
+    window.addEventListener('scroll', scheduleReading, {passive:true});
+    window.addEventListener('resize', scheduleReading);
+
+    // Share controls exist twice (side rail and the row under the author box),
+    // so they are wired by data-share. Share the canonical URL, not ?m=1.
+    var canonicalLink = document.querySelector('link[rel="canonical"]');
+    var shareUrl = (canonicalLink && canonicalLink.href) || window.location.href.split('#')[0];
+    var shareTitle = content.getAttribute('data-post-title') || document.title;
+    var shareStatus = document.getElementById('shareStatus');
+    var shareLinks = {
+      x: 'https://twitter.com/intent/tweet?url=' + encodeURIComponent(shareUrl) + '&text=' + encodeURIComponent(shareTitle),
+      linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(shareUrl),
+      whatsapp: 'https://wa.me/?text=' + encodeURIComponent(shareTitle + ' ' + shareUrl),
+      facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl)
+    };
+    function copyShareLink(button) {
+      var label = button.getAttribute('data-label') || button.textContent;
+      button.setAttribute('data-label', label);
+      function done(ok) {
+        button.textContent = ok ? 'Copied ✓' : 'Copy failed';
+        if (shareStatus) shareStatus.textContent = ok ? 'Link copied.' : 'The link could not be copied.';
+        setTimeout(function () { button.textContent = label; }, 1600);
+      }
+      function fallback() {
+        var field = document.createElement('textarea');
+        field.value = shareUrl;
+        field.setAttribute('readonly', '');
+        field.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+        document.body.appendChild(field);
+        field.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) {}
+        field.remove();
+        done(ok);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareUrl).then(function () { done(true); }, fallback);
+      } else {
+        fallback();
+      }
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-share]'), function (control) {
+      var kind = control.getAttribute('data-share');
+      if (kind === 'copy') control.addEventListener('click', function () { copyShareLink(control); });
+      else if (shareLinks[kind]) control.href = shareLinks[kind];
     });
 
     // Related papers — pull the post's first-label feed, drop the current post, show up to 3
