@@ -345,6 +345,12 @@ button, input { font: inherit; }
 }
 .read-link { color: var(--ink); font-weight: 800; }
 .read-link:hover { color: var(--accent); }
+.post-audio-flag {
+  display: inline-flex; align-items: center; min-height: 20px;
+  border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px;
+  color: var(--muted); font-size: .62rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+}
 
 /* Pagination */
 .blog-pagination { display: flex; justify-content: space-between; gap: 12px; margin-top: 48px; }
@@ -362,16 +368,28 @@ button, input { font: inherit; }
   margin: 16px auto 20px; max-width: 1020px;
   font: 400 clamp(3rem, 8vw, 7.2rem)/.93 var(--serif); letter-spacing: -.035em;
 }
-.article-dek { max-width: 780px; margin: 0 auto 20px; color: var(--muted); font-size: 1.08rem; line-height: 1.7; }
+/* Standfirst: the post's Search Description, shown under the title. */
+.article-dek {
+  max-width: 34em; margin: 0 auto 22px; color: var(--muted);
+  font: 400 clamp(1.08rem, 1.7vw, 1.3rem)/1.55 Georgia, 'Times New Roman', serif;
+  text-wrap: balance;
+}
 .article-byline {
   display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 9px;
   color: var(--muted); font-size: .78rem; font-weight: 650;
 }
-.article-hero {
-  width: min(calc(100% - 40px), 1180px); margin: 38px auto 56px;
-  max-height: 760px; overflow: hidden; background: var(--paper-2);
+.article-hero { width: min(calc(100% - 40px), 1180px); margin: 38px auto 56px; }
+.article-hero img {
+  width: 100%; height: auto; max-height: 760px; aspect-ratio: 16 / 9; object-fit: cover;
+  background: var(--paper-2);
 }
-.article-hero img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+/* The lead photo's credit, moved here from the post body by the script. */
+.article-hero-caption {
+  max-width: 72ch; margin: 10px 0 0; color: var(--muted);
+  font: .74rem/1.55 var(--sans); overflow-wrap: anywhere;
+}
+.article-hero-caption a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.article-hero-caption a:hover { color: var(--accent); }
 .article-layout {
   width: min(calc(100% - 40px), 1120px); margin: 0 auto;
   display: grid; grid-template-columns: 160px minmax(0,var(--reading)) 160px;
@@ -755,11 +773,15 @@ button, input { font: inherit; }
 .error-title { margin: 14px 0 12px; font: 400 clamp(2.4rem, 6vw, 4.4rem)/1 var(--serif); }
 .error-wrap p { max-width: 520px; margin: 0 auto 22px; color: var(--muted); line-height: 1.6; }
 
-/* Hide the body's own lead image so it doesn't duplicate the theme hero */
+/* Hide the body's own lead image so it doesn't duplicate the theme hero. A lead
+   figure keeps its caption, so photo credits stay visible without JavaScript;
+   the script then moves the caption under the hero and hides the figure. */
 .post-content > .separator:first-child,
-.post-content > figure:first-child,
+.post-content > img:first-child,
+.post-content > figure:first-child:has(img) > :not(figcaption),
 .post-content > p:first-child:has(> img:only-child),
 .post-content > p:first-child:has(> a:only-child > img:only-child) { display: none; }
+.post-content > figure:first-child:has(img) { margin-top: 0; }
 
 /* Prev / next paper */
 .post-nav {
@@ -1073,7 +1095,10 @@ summary:focus-visible,
                               </div>
                             </b:if>
                             <h2><a expr:href='data:post.url'><data:post.title/></a></h2>
-                            <p class='post-snippet'><data:post.snippet/></p>
+                            <!-- A longer snippet than Blogger's 140 characters, so the
+                                 script can drop the photo credit and audio fallback text
+                                 and still show the paper's opening lines. -->
+                            <p class='post-snippet'><b:eval expr='snippet(data:post.body, {length: 500, links: false, linebreaks: false})'/></p>
                             <div class='post-meta'>
                               <span>By Francis Pwavwe</span>
                               <span class='dot post-date'><data:post.timestamp/></span>
@@ -1108,7 +1133,7 @@ summary:focus-visible,
                   </div>
                 </b:if>
                 <h2><a expr:href='data:post.url'><data:post.title/></a></h2>
-                <p class='post-snippet'><data:post.snippet/></p>
+                <p class='post-snippet'><b:eval expr='snippet(data:post.body, {length: 500, links: false, linebreaks: false})'/></p>
                 <div class='post-meta'>
                   <span>By Francis Pwavwe</span>
                   <span class='dot post-date'><data:post.timestamp/></span>
@@ -1124,7 +1149,11 @@ summary:focus-visible,
               <meta expr:content='data:post.timestampISO8601' itemprop='datePublished'/>
               <meta expr:content='data:post.lastUpdatedISO8601' itemprop='dateModified'/>
               <meta expr:content='data:blog.canonicalUrl' itemprop='mainEntityOfPage'/>
-              <meta expr:content='data:post.snippet' itemprop='description'/>
+              <b:if cond='data:blog.metaDescription'>
+                <meta expr:content='data:blog.metaDescription' itemprop='description'/>
+              <b:else/>
+                <meta expr:content='data:post.snippet' itemprop='description'/>
+              </b:if>
               <header class='article-header'>
                 <b:if cond='data:post.labels'>
                   <div class='article-kicker'>
@@ -1134,6 +1163,12 @@ summary:focus-visible,
                   </div>
                 </b:if>
                 <h1 class='article-title' itemprop='headline'><data:post.title/></h1>
+                <!-- Standfirst from the post's Search Description (Post settings).
+                     Blogger cuts those at 150 characters, so the script trims a
+                     cut-off one back to its last full sentence. -->
+                <b:if cond='data:blog.pageType == &quot;item&quot; and data:blog.metaDescription'>
+                  <p class='article-dek'><data:blog.metaDescription/></p>
+                </b:if>
                 <div class='article-byline'>
                   <span>By <strong>Francis Pwavwe</strong></span>
                   <span>•</span>
@@ -1437,6 +1472,66 @@ summary:focus-visible,
     date.textContent = value;
   });
 
+  // A card snippet is the start of the paper's text, which is usually the lead
+  // photo's credit and the audio player's fallback text. Drop those so each card
+  // opens with the essay itself, and mark papers that have an audio edition.
+  (function cleanCardSnippets() {
+    var hasAudio = /az-studio\.web\.app\/embed\/audio|\bListen to this paper\b|\bElevenLabs_/i;
+    var audioMarker = /\bListen to this paper\b[\s\S]*?(?:\bOpen audio in a new tab\b\.?|$)/i;
+    var voiceFile = /[^.!?]{0,80}?\bElevenLabs_\S*\s*/;
+    var credit = new RegExp([
+      '\\b(?:unsplash|wikimedia(?:\\s+commons)?|pexels|pixabay|flickr|getty(?:\\s+images)?|public\\s+domain|cc0|cc\\s+by(?:[-\\s](?:sa|nc|nd))*(?:\\s+\\d(?:\\.\\d)?)?)\\b(?:\\s*\\([^)]{0,40}\\))?\\s*[.;,]*',
+      '\\b(?:photo(?:graph)?|image|illustration)\\s+by\\s[^.!?]{1,80}?(?:[.!?](?=\\s|$)|$)',
+      '\\b(?:photo(?:graph)?|image|illustration|credit|source)s?\\s*:\\s*[^.!?]{1,80}?(?:[.!?](?=\\s|$)|$)'
+    ].join('|'), 'gi');
+    var pictured = /^The (?:person|people|individuals?|man|woman) (?:pictured|shown|depicted)[^.!?]*[.!?]\s*/i;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.post-card .post-snippet'), function (snippet) {
+      try {
+        var card = snippet.closest('.post-card');
+        var text = (snippet.textContent || '').replace(/\s+/g, ' ').trim();
+        var cut = /(?:\.{3}|\u2026)$/.test(text);
+        var meta = card.querySelector('.post-meta');
+        if (meta && hasAudio.test(text)) {
+          var flag = document.createElement('span');
+          flag.className = 'dot';
+          flag.innerHTML = '<span class="post-audio-flag">Audio edition</span>';
+          var read = meta.querySelector('.read-link');
+          meta.insertBefore(flag, read ? read.closest('.dot') : null);
+        }
+
+        text = text.replace(/(?:\.{3}|\u2026)$/, '').replace(audioMarker, ' ').replace(voiceFile, ' ');
+        // Defensive: drop any CSS text a snippet picked up from an embed's style block.
+        while (/\{[^{}]*\}/.test(text)) text = text.replace(/(?:@media[^{]*|[^\s{}]*)\{[^{}]*\}/g, ' ');
+        text = text.replace(/[^\s{}]*\{[\s\S]*$/, '');
+        // Captions exist only on cards with an image: cut through the last credit
+        // found near the start (descriptive captions name their source last).
+        if (card.querySelector('.post-card-media img')) {
+          var end = 0, match;
+          credit.lastIndex = 0;
+          while ((match = credit.exec(text)) && match.index < 260) {
+            end = match.index + match[0].length;
+            if (!match[0].length) credit.lastIndex++;
+          }
+          if (end) text = text.slice(end);
+        }
+        text = text.replace(/^[\s.,;:\u00b7\u2022|\u2013\u2014-]+/, '').replace(pictured, '');
+        text = text.replace(/\s+([.,;:!?])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+        if (cut) text = text.replace(/\s+\S*$/, '');
+
+        var limit = card.matches(':first-child') ? 260 : 170;
+        var ellipsis = function (t) {
+          t = t.replace(/[,;:]$/, '');
+          return /[.!?\u2026]["'\u201d\u2019)]?$/.test(t) ? t : t + '\u2026';
+        };
+        if (text.length > limit) text = ellipsis(text.slice(0, limit).replace(/\s+\S*$/, ''));
+        else if (cut && text) text = ellipsis(text);
+        if (text.length < 40) snippet.remove();
+        else snippet.textContent = text;
+      } catch (e) {}
+    });
+  })();
+
   // Cards use one broad section plus one useful topic. This keeps the existing
   // Blogger labels searchable without turning the homepage into a tag cloud.
   (function simplifyDisplayedLabels() {
@@ -1682,6 +1777,49 @@ summary:focus-visible,
         break;
       }
     })();
+
+    // The hero shows the paper's first image. When the body opens with that
+    // same image, hide the body's copy and move its credit under the hero.
+    (function leadImageToHero() {
+      var hero = document.querySelector('.article-hero');
+      if (!hero) return;
+      var lead = null;
+      for (var el = content.firstElementChild; el; el = el.nextElementSibling) {
+        if (/^(STYLE|SCRIPT|LINK|META|BR)$/.test(el.tagName)) continue;
+        if (el.hidden || el.getAttribute('aria-hidden') === 'true') continue;
+        if (el.tagName !== 'IMG' && !(el.textContent || '').trim() && !el.querySelector('img, iframe, video')) continue;
+        lead = el;
+        break;
+      }
+      if (!lead) return;
+      var image = lead.tagName === 'IMG' ? lead : lead.querySelector('img');
+      if (!image || image !== content.querySelector('img')) return;
+      var isLeadImage = lead.tagName === 'IMG' || lead.tagName === 'FIGURE' ||
+        lead.classList.contains('separator') || lead.matches('table.tr-caption-container') ||
+        (lead.tagName === 'P' && !(lead.textContent || '').trim());
+      if (!isLeadImage) return;
+      var caption = lead.querySelector('figcaption, td.tr-caption');
+      if (caption && (caption.textContent || '').trim()) {
+        var heroCaption = document.createElement('figcaption');
+        heroCaption.className = 'article-hero-caption';
+        while (caption.firstChild) heroCaption.appendChild(caption.firstChild);
+        hero.appendChild(heroCaption);
+      }
+      lead.hidden = true;
+    })();
+
+    // Blogger cuts Search Descriptions at 150 characters. End a cut-off dek on
+    // its last full sentence rather than mid-word.
+    var dek = document.querySelector('.article-dek');
+    if (dek) {
+      var dekText = (dek.textContent || '').replace(/\s+/g, ' ').trim();
+      if (dekText && !/[.!?…"'”’)]$/.test(dekText)) {
+        var stop = Math.max(dekText.lastIndexOf('. '), dekText.lastIndexOf('! '), dekText.lastIndexOf('? '));
+        dekText = stop > 40 ? dekText.slice(0, stop + 1) : dekText.replace(/\s+\S*$/, '') + '…';
+      }
+      if (dekText) dek.textContent = dekText;
+      else dek.remove();
+    }
 
     Array.prototype.forEach.call(content.querySelectorAll('img'), function (image) {
       image.setAttribute('loading', 'lazy');
