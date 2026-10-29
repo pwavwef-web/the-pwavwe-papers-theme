@@ -7,10 +7,12 @@
 
 ## Two supported players
 
-- **AZ Studio player (current).** Recent papers paste a `<div class="pwavwe-audio-embed">` block whose iframe loads `https://az-studio.web.app/embed/audio/<id>`. The theme moves the first such block into the **Listen to this paper** panel above the text, opens the player in the reader's light/dark theme and keeps it in sync, and resizes the iframe to the height the player reports (up to 600px). The theme now carries the block's styles, so the `<style>` element inside the copied block is optional; older posts that include it still render the same. Paste the block in **HTML view**, as below.
+- **AZ Studio player (current).** Recent papers paste a `<div class="pwavwe-audio-embed">` block whose iframe loads `https://az-studio.web.app/embed/audio/<id>`. The theme moves the first such block under the **Audio edition** strip above the text, opens the player in the reader's light/dark theme and keeps it in sync, and resizes the iframe to the height the player reports (up to 600px). The theme now carries the block's styles, so the `<style>` element inside the copied block is optional; older posts that include it still render the same. Paste the block in **HTML view**, as below.
 - **SoundCloud (older papers).** Described in the rest of this guide.
 
-The theme displays a **Listen to this paper** panel above the article text when the post contains a SoundCloud player. Its caption is **In Francis Pwavwe's voice.** Papers without a player have no audio panel. No API key or connection between Blogger and ElevenLabs is needed.
+The theme displays a one-line **Audio edition · In Francis Pwavwe's voice** strip, with an **Open audio** link, above the article text when the post contains a player. The player itself carries the paper's title. The byline also gains a **Listen instead** link that jumps to the player, and the paper's homepage card shows an **Audio edition** badge. Papers without a player have none of these. No API key or connection between Blogger and ElevenLabs is needed.
+
+Keep the copied embed code as it is. The homepage card summary is taken from the start of the post, and the theme recognises the player's fallback text ("Listen to this paper: <link>" inside the iframe, and the "Open audio in a new tab" link) to remove it from the card and to add the badge. For SoundCloud, it recognises the ElevenLabs file name in the attribution line.
 
 ## For each paper
 
