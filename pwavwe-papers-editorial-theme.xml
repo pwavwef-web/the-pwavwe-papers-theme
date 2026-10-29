@@ -568,8 +568,13 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
   width: 54px; height: 54px; border-radius: 50%; background: var(--accent-solid); color: white;
   display: grid; place-items: center; font-family: var(--serif); font-size: 1.35rem;
 }
-.author-box h3 { margin: 0 0 6px; font: 400 1.4rem/1 var(--serif); }
+.author-box .author-name { margin: 0 0 6px; font: 400 1.4rem/1 var(--serif); }
 .author-box p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.6; }
+/* On a paper, the author note and the newsletter form share one card. */
+body.item .paper-end {
+  border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden;
+}
+body.item .paper-end .author-box { border: 0; background: none; }
 
 /* Comments */
 .comments-wrap {
@@ -852,24 +857,24 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
 .post-content > p:first-child:has(> a:only-child > img:only-child) { display: none; }
 .post-content > figure:first-child:has(img) { margin-top: 0; }
 
-/* Prev / next paper */
+/* Newer / older paper: quiet text links under Continue reading */
 .post-nav {
-  width: min(calc(100% - 40px), var(--reading)); margin: 30px auto 0;
+  width: min(calc(100% - 40px), var(--reading)); margin: 28px auto 0;
   display: flex; justify-content: space-between; gap: 14px;
 }
 .post-nav-link {
-  border: 1px solid var(--line); background: var(--card); border-radius: 999px;
-  padding: 12px 18px; font-size: .82rem; font-weight: 800;
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--muted); font-size: .82rem; font-weight: 800;
 }
-.post-nav-link:hover { border-color: var(--accent); color: var(--accent); }
+.post-nav-link:hover { color: var(--accent); }
 .post-nav-link--next { margin-left: auto; }
 
-/* Related papers */
+/* Continue reading */
 .related {
   width: min(calc(100% - 40px), var(--reading)); margin: 46px auto 0;
   border-top: 1px solid var(--line); padding-top: 26px;
 }
-.related-head { font: 400 1.6rem/1 var(--serif); margin-bottom: 18px; }
+.related-head { margin: 0 0 18px; font: 400 1.6rem/1 var(--serif); }
 .related-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
 .related-card { display: grid; gap: 10px; min-width: 0; }
 .related-thumb {
@@ -880,14 +885,24 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
 .related-title { font: 400 1.05rem/1.2 var(--serif); }
 .related-card:hover .related-title { color: var(--accent); }
 
-/* Subscribe */
-.subscribe { width: min(calc(100% - 40px), var(--reading)); margin: 46px auto 0; }
-.subscribe-inner {
-  background: var(--card); border: 1px solid var(--line); border-radius: 4px;
-  padding: 30px; text-align: center;
+/* Subscribe: the lower half of the paper-end card */
+.subscribe { padding: 20px 24px 22px; border-top: 1px solid var(--line); }
+.subscribe-title { margin: 0 0 4px; font: 400 clamp(1.3rem, 2.4vw, 1.55rem)/1.15 var(--serif); }
+.subscribe-copy { margin: 0 0 14px; color: var(--muted); font-size: .86rem; line-height: 1.55; }
+.subscribe .subscribe-form { max-width: 520px; margin: 0; }
+.subscribe .subscribe-note { min-height: 0; margin-top: 10px; }
+/* Collapsed while empty but kept in the accessibility tree, so the live
+   region still announces the result. */
+.subscribe .subscribe-note:empty { margin-top: 0; }
+/* After a successful sign-up the form gives way to the confirmation. */
+.subscribe-form[hidden] { display: none; }
+.subscribe-note--ok { color: var(--ink); font-weight: 650; }
+.subscribe-note:focus { outline: none; }
+/* Papers carry their own form, so the footer doesn't repeat it there. */
+body.item .footer-subscribe { display: none; }
+@media (min-width: 981px) {
+  body.item .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
 }
-.subscribe-inner h3 { margin: 0 0 8px; font: 400 clamp(1.6rem, 3.5vw, 2.2rem)/1.05 var(--serif); }
-.subscribe-inner p { margin: 0 auto 18px; max-width: 440px; color: var(--muted); font-size: .92rem; line-height: 1.6; }
 .subscribe-btn {
   display: inline-block; background: var(--accent-solid); color: #fff; font-weight: 800;
   font-size: .82rem; padding: 12px 22px; border-radius: 999px;
@@ -917,7 +932,10 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
 }
 
 @media (max-width: 640px) {
-  .related-grid { grid-template-columns: 1fr; gap: 20px; }
+  /* Compact rows on phones: thumbnail left, title right. */
+  .related-grid { grid-template-columns: 1fr; gap: 14px; }
+  .related-card { grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 14px; }
+  .related-thumb { aspect-ratio: 4 / 3; }
 }
 
 @media (max-width: 980px) {
@@ -1028,7 +1046,7 @@ summary:focus-visible,
   ]]></b:skin>
 </head>
 
-<body>
+<body expr:class='data:blog.pageType'>
   <a class='skip-link' href='#main'>Skip to content</a>
   <div class='reading-progress' id='readingProgress'></div>
   <div class='site-shell'>
@@ -1349,14 +1367,35 @@ summary:focus-visible,
                 </aside>
               </div>
 
+              <!-- A paper ends once: who wrote it and how to get the next one (one
+                   card), then what to read next, then the discussion. -->
               <footer class='article-footer'>
-                <div class='author-box' itemprop='author' itemscope='itemscope' itemtype='https://schema.org/Person'>
-                  <div class='author-mark'>FP</div>
-                  <div>
-                    <h3 itemprop='name'>Francis Pwavwe</h3>
-                    <p>Tourism graduate, builder, researcher and chronic follower of interesting rabbit holes. The Pwavwe Papers is where those threads become essays.</p>
-                    <link href='https://pwavwe.com' itemprop='url'/>
+                <div class='paper-end'>
+                  <div class='author-box' itemprop='author' itemscope='itemscope' itemtype='https://schema.org/Person'>
+                    <div class='author-mark'>FP</div>
+                    <div>
+                      <h2 class='author-name' itemprop='name'>Francis Pwavwe</h2>
+                      <p>Tourism graduate, builder, researcher and chronic follower of interesting rabbit holes. The Pwavwe Papers is where those threads become essays.</p>
+                      <link href='https://pwavwe.com' itemprop='url'/>
+                    </div>
                   </div>
+                  <b:if cond='data:blog.pageType == &quot;item&quot;'>
+                    <!-- Subscribe — Firebase Firestore email capture. Writes to the
+                         'subscribers' collection in the francis-pwavwe project. The
+                         doc shape {email, source, status, timestamp} is enforced by
+                         the Firestore security rules; keep it exactly. -->
+                    <section aria-labelledby='subscribeTitle' class='subscribe' id='subscribe'>
+                      <h2 class='subscribe-title' id='subscribeTitle'>Get the next paper</h2>
+                      <p class='subscribe-copy'>No spam, no schedule — just a note when there’s something worth saying.</p>
+                      <form class='subscribe-form' id='fp-sub'>
+                        <input aria-label='Email address' autocomplete='email' class='subscribe-input' id='fp-email' name='email' placeholder='you@example.com' required='required' spellcheck='false' type='email'/>
+                        <input type='text' name='website' id='fp-website' tabindex='-1' autocomplete='off' aria-hidden='true' style='position:absolute;left:-9999px'/>
+                        <button class='subscribe-btn' type='submit'>Subscribe</button>
+                      </form>
+                      <p aria-live='polite' class='subscribe-note' id='fp-msg'/>
+                      <p class='subscribe-privacy'>By subscribing, you agree to the <a href='/p/privacy.html'>privacy notice</a>. Unsubscribe whenever you like.</p>
+                    </section>
+                  </b:if>
                 </div>
                 <b:if cond='data:blog.pageType == &quot;item&quot;'>
                   <div aria-label='Share this paper' class='share-row' role='group'>
@@ -1372,17 +1411,19 @@ summary:focus-visible,
               </footer>
 
               <b:if cond='data:blog.pageType == &quot;item&quot;'>
-                <!-- Related papers: filled from the post's first-label JSON feed (see script) -->
+                <!-- Continue reading: filled by the script from the feeds of this
+                     paper's topic, then its section. -->
                 <b:if cond='data:post.labels'>
-                  <section class='related' expr:data-current='data:post.url' id='related' style='display:none'>
+                  <section aria-labelledby='relatedTitle' class='related' expr:data-current='data:post.url' id='related' style='display:none'>
                     <span id='relatedLabel' style='display:none'><b:loop index='li' values='data:post.labels' var='label'><b:if cond='data:li == 0'><data:label.name/></b:if></b:loop></span>
-                    <div class='related-head'>More from the archive</div>
+                    <h2 class='related-head' id='relatedTitle'>Continue reading</h2>
                     <div class='related-grid' id='relatedGrid'></div>
                   </section>
                 </b:if>
 
-                <!-- Prev / next paper -->
-                <nav aria-label='More papers' class='post-nav'>
+                <!-- Newer / older paper. A sibling of #related, not inside it, so
+                     it still shows when no related papers load. -->
+                <nav aria-label='Newer and older papers' class='post-nav'>
                   <b:if cond='data:newerPageUrl'>
                     <a class='post-nav-link' expr:href='data:newerPageUrl'>← Newer paper</a>
                   <b:else/>
@@ -1392,24 +1433,6 @@ summary:focus-visible,
                     <a class='post-nav-link post-nav-link--next' expr:href='data:olderPageUrl'>Older paper →</a>
                   </b:if>
                 </nav>
-
-                <!-- Subscribe — Firebase Firestore email capture. Writes to the
-                     'subscribers' collection in the francis-pwavwe project. The
-                     doc shape {email, source, status, timestamp} is enforced by
-                     the Firestore security rules; keep it exactly. -->
-                <section class='subscribe'>
-                  <div class='subscribe-inner'>
-                    <h3>Get new papers in your inbox</h3>
-                    <p>No spam, no schedule — just a note when there’s something worth saying.</p>
-                    <form class='subscribe-form' id='fp-sub'>
-                      <input aria-label='Email address' autocomplete='email' class='subscribe-input' id='fp-email' name='email' placeholder='you@example.com' required='required' spellcheck='false' type='email'/>
-                      <input type='text' name='website' id='fp-website' tabindex='-1' autocomplete='off' aria-hidden='true' style='position:absolute;left:-9999px'/>
-                      <button class='subscribe-btn' type='submit'>Subscribe</button>
-                    </form>
-                    <p aria-live='polite' class='subscribe-note' id='fp-msg'/>
-                    <p class='subscribe-privacy'>By subscribing, you agree to the <a href='/p/privacy.html'>privacy notice</a>. Unsubscribe whenever you like.</p>
-                  </div>
-                </section>
               </b:if>
 
               <b:if cond='data:blog.pageType == &quot;item&quot; and data:post.allowComments'>
@@ -1744,7 +1767,7 @@ summary:focus-visible,
     });
   })();
 
-  // One lazy Firebase loader serves the article, popup and footer forms. The
+  // One lazy Firebase loader serves the article and footer forms. The
   // local receipt prevents repeated writes from the same browser; Firestore
   // rules remain the authoritative server-side shape and permission check.
   var newsletterConfig = {apiKey:"AIzaSyB6lxgjNY4CRNHAe3pAgR5SYv1ohL8brOI",authDomain:"francis-pwavwe.firebaseapp.com",projectId:"francis-pwavwe",storageBucket:"francis-pwavwe.firebasestorage.app",messagingSenderId:"658069378543",appId:"1:658069378543:web:87b1dcb0dd27d3255bd21a"};
@@ -1814,8 +1837,16 @@ summary:focus-visible,
         return db.collection('subscribers').add({ email: email.value.trim().toLowerCase(), source: source, status: 'subscribed', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
       }).then(function () {
         newsletterStorageSet(newsletterSubscribedKey, 'true');
-        if (message) message.textContent = 'You are in \u2014 thanks for subscribing.';
         form.reset();
+        // The form gives way to the confirmation; focus follows so keyboard
+        // users are not left on a hidden button.
+        var focusWasInForm = form.contains(document.activeElement) || document.activeElement === document.body;
+        form.hidden = true;
+        if (message) {
+          message.textContent = 'You are in \u2014 thanks for subscribing.';
+          message.classList.add('subscribe-note--ok');
+          if (focusWasInForm) { message.setAttribute('tabindex', '-1'); message.focus(); }
+        }
         document.dispatchEvent(new CustomEvent('pwavwe:subscribed'));
         if (onSuccess) onSuccess();
       }).catch(function (error) {
@@ -2188,42 +2219,65 @@ summary:focus-visible,
       else if (shareLinks[kind]) control.href = shareLinks[kind];
     });
 
-    // Related papers — pull the post's first-label feed, drop the current post, show up to 3
+    // Continue reading: up to three papers from this one's topic label (the
+    // closer match), topped up from its broader section. The kicker already
+    // shows [section, topic]; read the label names from its links, because the
+    // displayed text may be shortened (Artificial Intelligence shows as AI).
     var relatedWrap = document.getElementById('related');
-    if (relatedWrap) {
-      var labelEl = document.getElementById('relatedLabel');
-      var relLabel = labelEl ? (labelEl.textContent || '').trim() : '';
-      var currentUrl = relatedWrap.getAttribute('data-current') || window.location.href;
-      var grid = document.getElementById('relatedGrid');
-      if (relLabel && grid) {
-        var feedUrl = '/feeds/posts/default/-/' + encodeURIComponent(relLabel) + '?alt=json&max-results=8';
-        fetch(feedUrl).then(function (r) { return r.json(); }).then(function (json) {
-          var entries = (json.feed && json.feed.entry) || [];
-          var picks = [];
-          for (var n = 0; n < entries.length && picks.length < 3; n++) {
-            var e = entries[n];
-            var href = '';
-            (e.link || []).forEach(function (l) { if (l.rel === 'alternate') href = l.href; });
-            if (!href) continue;
-            if (currentUrl.indexOf(href) !== -1 || href.indexOf(currentUrl) !== -1) continue;
-            var t = (e.title && e.title.$t) || 'Untitled paper';
-            var thumb = (e.media$thumbnail && e.media$thumbnail.url) ? e.media$thumbnail.url.replace(/\/s72-c\//, '/w600-h375-c/') : '';
-            picks.push({ href: href, title: t, thumb: thumb });
-          }
-          if (!picks.length) return;
-          var html = '';
-          picks.forEach(function (p) {
-            var safe = p.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            html += '<a class="related-card" href="' + p.href + '">';
-            html += p.thumb
-              ? '<span class="related-thumb" style="background-image:url(\'' + p.thumb + '\')"></span>'
-              : '<span class="related-thumb related-thumb--empty"></span>';
-            html += '<span class="related-title">' + safe + '</span></a>';
-          });
-          grid.innerHTML = html;
-          relatedWrap.style.display = '';
-        }).catch(function () {});
+    var relatedGrid = document.getElementById('relatedGrid');
+    if (relatedWrap && relatedGrid) {
+      var relatedLabels = [];
+      Array.prototype.forEach.call(document.querySelectorAll('.article-kicker a'), function (a) {
+        var m = /\/search\/label\/([^?#]+)/.exec(a.getAttribute('href') || '');
+        if (m) relatedLabels.push(decodeURIComponent(m[1]));
+      });
+      if (relatedLabels.length > 1) relatedLabels = [relatedLabels[1], relatedLabels[0]];
+      if (!relatedLabels.length) {
+        var labelEl = document.getElementById('relatedLabel');
+        if (labelEl && labelEl.textContent.trim()) relatedLabels.push(labelEl.textContent.trim());
       }
+      var relatedPicks = [], relatedSeen = {};
+      relatedSeen[(relatedWrap.getAttribute('data-current') || window.location.href).split(/[?#]/)[0]] = true;
+      var fetchRelated = function (index) {
+        if (relatedPicks.length >= 3 || index >= relatedLabels.length) return Promise.resolve();
+        return fetch('/feeds/posts/summary/-/' + encodeURIComponent(relatedLabels[index]) + '?alt=json&max-results=6')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (json) {
+            ((json && json.feed && json.feed.entry) || []).forEach(function (e) {
+              if (relatedPicks.length >= 3) return;
+              var href = '';
+              (e.link || []).forEach(function (l) { if (l.rel === 'alternate') href = l.href; });
+              var key = href.split(/[?#]/)[0];
+              if (!href || relatedSeen[key]) return;
+              relatedSeen[key] = true;
+              var thumb = (e.media$thumbnail && e.media$thumbnail.url) || '';
+              relatedPicks.push({
+                href: href,
+                title: (e.title && e.title.$t) || 'Untitled paper',
+                thumb: thumb.replace(/\/s72-c\//, '/w600-h375-c/').replace(/=s72-c$/, '=w600-h375-c')
+              });
+            });
+            return fetchRelated(index + 1);
+          });
+      };
+      fetchRelated(0).then(function () {
+        if (!relatedPicks.length) return;
+        relatedPicks.forEach(function (p) {
+          var card = document.createElement('a');
+          card.className = 'related-card';
+          card.href = p.href;
+          var thumb = document.createElement('span');
+          thumb.className = p.thumb ? 'related-thumb' : 'related-thumb related-thumb--empty';
+          if (p.thumb) thumb.style.backgroundImage = 'url("' + p.thumb.replace(/"/g, '%22') + '")';
+          var title = document.createElement('span');
+          title.className = 'related-title';
+          title.textContent = p.title;
+          card.appendChild(thumb);
+          card.appendChild(title);
+          relatedGrid.appendChild(card);
+        });
+        relatedWrap.style.display = '';
+      }).catch(function () {});
     }
 
   }
