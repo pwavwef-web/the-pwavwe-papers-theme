@@ -16,33 +16,17 @@
      Blogger comments, and AZ Studio / SoundCloud audio players). It is not legal advice. If you later add
      other analytics or advertising providers, extend the relevant sections.
      Update the date when you change it.
+
+     STYLES: the theme supplies the page title, prose, .page-eyebrow
+     and .page-next.
      ============================================================ -->
 
 <style>
-.article-byline, .author-box, .comments-wrap, .article-aside, .article-hero { display: none !important; }
-.article-layout { grid-template-columns: minmax(0, 720px) !important; }
-
-.legal-page { font-family: 'Inter', Arial, sans-serif; color: var(--ink); }
-.legal-page * { box-sizing: border-box; }
-.legal-page .updated {
-  color: var(--muted); font-size: .74rem; font-weight: 800;
-  letter-spacing: .08em; text-transform: uppercase; margin: 0 0 24px;
-}
-.legal-page p, .legal-page li { font-size: 1rem; line-height: 1.8; color: var(--ink); }
-.legal-page p { margin: 0 0 18px; }
-.legal-page h2 {
-  font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
-  font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.15;
-  margin: 36px 0 12px;
-}
-.legal-page ul { margin: 0 0 18px; padding-left: 22px; }
-.legal-page li { margin: 0 0 8px; }
-.legal-page a { color: var(--accent); text-decoration: none; }
-.legal-page a:hover { text-decoration: underline; }
+.legal-page .updated { margin: 0 0 24px; }
 </style>
 
 <div class="legal-page">
-  <p class="updated">Last updated — 26 October 2026</p>
+  <p class="page-eyebrow updated">Last updated — 26 October 2026</p>
 
   <p>This page explains what happens to your information when you visit The Pwavwe Papers. The short version: I collect as little as possible, I don't sell anything about you, and the only data you actively hand over is an email address — and only if you choose to subscribe.</p>
 
@@ -50,7 +34,7 @@
   <p>The Pwavwe Papers is a personal publication written by Francis Pwavwe. For anything on this page, or to have your data removed, reach me via the <a href="/p/contact.html">contact page</a>.</p>
 
   <h2>Hosting</h2>
-  <p>The site runs on Blogger, a service provided by Google. Like most web hosts, Google's servers automatically record standard technical information when a page is requested — such as your IP address, browser type, and the pages you view — for security and to keep the service running. That data is handled under <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">Google's Privacy Policy</a>.</p>
+  <p>The site runs on Blogger, a service provided by Google. Like most web hosts, Google's servers automatically record standard technical information when a page is requested — such as your IP address, browser type, and the pages you view — for security and to keep the service running. That data is handled under <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy ↗</a>.</p>
 
   <h2>The newsletter</h2>
   <p>If you use a subscribe box, your email address is stored in a private database (Google's Firebase / Cloud Firestore) so I can send you a note when there's a new essay. That's the only reason it's kept. I don't share or sell it, and you can ask me to delete it at any time via the <a href="/p/contact.html">contact page</a>. Every newsletter email will include a way to unsubscribe.</p>
@@ -60,17 +44,17 @@
   <p>If you switch between light and dark mode, that choice is saved in your own browser (using <em>localStorage</em>) so the site remembers it next time. It never leaves your device and isn't sent to me or anyone else. Clearing your browser storage removes it.</p>
 
   <h2>Comments</h2>
-  <p>Comments are handled by Blogger's built-in system and load only when you open the discussion area. Commenting may be tied to your Google account. Anything you post is public, and its handling falls under <a href="https://policies.google.com/privacy" rel="noopener" target="_blank">Google's Privacy Policy</a>. Don't share anything in a comment you wouldn't want to be public.</p>
+  <p>Comments are handled by Blogger's built-in system and load only when you open the discussion area. Commenting may be tied to your Google account. Anything you post is public, and its handling falls under <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy ↗</a>. Don't share anything in a comment you wouldn't want to be public.</p>
 
   <h2>Cookies</h2>
   <p>Blogger and other Google services may set cookies needed to run the platform, measure use, prevent abuse, support comments, or deliver advertising. You can block or delete cookies in your browser settings; the publication will still be readable, though commenting and some conveniences may not work.</p>
 
   <h2>Analytics and advertising</h2>
-  <p>Blogger may load Google measurement and advertising services, including AdSense resources. Those services can use cookies or similar identifiers to measure traffic, limit repeated ads, detect fraud and choose or measure advertising. Their handling is described in <a href="https://policies.google.com/technologies/ads" rel="noopener" target="_blank">Google's advertising policies</a>. I don't receive your name or email address from those services.</p>
+  <p>Blogger may load Google measurement and advertising services, including AdSense resources. Those services can use cookies or similar identifiers to measure traffic, limit repeated ads, detect fraud and choose or measure advertising. Their handling is described in <a href="https://policies.google.com/technologies/ads" rel="noopener">Google's advertising policies ↗</a>. I don't receive your name or email address from those services.</p>
 
   <h2>Audio versions</h2>
   <p>Some papers include a read version. Most play in The Pwavwe Papers' own audio player, served from az-studio.web.app on Google's Firebase Hosting; when it loads, your browser connects to that service, which receives technical information such as your IP address and browser details. The site tells the player whether you're using light or dark mode so it matches the page, and nothing else.</p>
-  <p>Some older papers use a player hosted on SoundCloud. When it loads, your browser connects to SoundCloud to display it and play the audio. SoundCloud may receive technical information such as your IP address and browser details, and may use cookies or similar technologies under its own <a href="https://soundcloud.com/pages/privacy" rel="noopener" target="_blank">Privacy Policy</a>. You can read the written paper without playing the audio.</p>
+  <p>Some older papers use a player hosted on SoundCloud. When it loads, your browser connects to SoundCloud to display it and play the audio. SoundCloud may receive technical information such as your IP address and browser details, and may use cookies or similar technologies under its own <a href="https://soundcloud.com/pages/privacy" rel="noopener">Privacy Policy ↗</a>. You can read the written paper without playing the audio.</p>
 
   <h2>Links to other sites</h2>
   <p>Essays sometimes link out to other websites. Once you follow a link, you're on someone else's property and their privacy practices apply — I can't control or take responsibility for them.</p>
@@ -84,4 +68,8 @@
 
   <h2>Changes to this policy</h2>
   <p>If this policy changes, I'll update the date at the top of this page. Continued use of the site after a change means you accept the updated version.</p>
+
+  <div class="page-next">
+    <p>Questions about any of this? Ask on the <a href="/p/contact.html">contact page</a>, or go back to <a href="/p/all-papers.html">all papers</a>.</p>
+  </div>
 </div>

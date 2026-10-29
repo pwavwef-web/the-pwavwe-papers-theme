@@ -2,149 +2,114 @@
      THE PWAVWE PAPERS — "Start Here" page
      ------------------------------------------------------------
      HOW TO INSTALL
-     1. Blogger → Pages → New page
+     1. Blogger → Pages → New page (or open the existing Start Here page)
      2. Title the page:  Start Here
      3. Switch the editor to  HTML view  (top-left "HTML"/"< >"
         toggle) — do NOT use Compose view
      4. Paste EVERYTHING in this file, then Publish
-     5. The published URL will be  /p/start-here.html  — the current
-        theme links it from the header, mobile menu and footer.
+     5. The published URL will be  /p/start-here.html  — the theme
+        links it from the header, mobile menu and footer.
 
      WHAT IT DOES
-     • "Editor's picks" — your hand-chosen flagship essays. Empty by
-       default (the section hides itself). Add yours in the FEATURED
-       list marked [edit] below — nothing else to touch.
+     • "If you only read three" — hand-picked papers for a first-time
+       reader. Edit the FEATURED list marked [edit] below. The heading
+       follows the number of picks; an empty list hides the section.
      • "Explore by rabbit hole" — one card per topic. Each card links
-       to that topic's archive AND auto-lists its latest essays from
-       the blog feed, so the page is useful the moment it's published
-       and stays current on its own. A topic with no posts hides
-       itself automatically, so it's safe to leave extras in the list.
+       to that topic's archive and lists its latest papers from the
+       blog feed, so the page stays current on its own. A topic with
+       no posts hides itself, so extras in the list are harmless.
+
+     STYLES: the theme supplies the page title, prose, .page-lede,
+     .page-card, .page-list, .page-next and .btn / .btn--solid. Only
+     the layout specific to this page is defined below.
      ============================================================ -->
 
 <style>
-/* Strip post-only chrome so this reads as a clean landing page */
-.article-byline, .author-box, .comments-wrap, .article-aside, .article-hero { display: none !important; }
-.article-layout { grid-template-columns: minmax(0, 960px) !important; }
+.sh-intro { max-width: 680px; }
+.sh-sub { max-width: 640px; margin: -4px 0 20px; color: var(--muted); font-size: .95rem; line-height: 1.6; }
 
-.start-here { font-family: 'Inter', Arial, sans-serif; color: var(--ink); }
-.start-here * { box-sizing: border-box; }
-
-.sh-lede {
-  font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
-  font-size: clamp(1.35rem, 3vw, 1.9rem); line-height: 1.3; color: var(--ink);
-  margin: 0 0 22px;
-}
-.sh-intro { font-size: 1.02rem; line-height: 1.8; color: var(--ink); margin: 0 0 14px; max-width: 680px; }
-.sh-intro a { color: var(--accent); text-decoration: none; }
-.sh-intro a:hover { text-decoration: underline; }
-
-.start-here .sh-h2 {
-  font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
-  font-size: clamp(1.5rem, 3.4vw, 2.1rem); line-height: 1.1; color: var(--ink);
-  margin: 46px 0 6px;
-}
-.sh-sub { color: var(--muted); font-size: .95rem; line-height: 1.6; margin: 0 0 20px; max-width: 640px; }
-
-/* Editor's picks */
-.sh-picks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+/* If you only read three */
+.sh-picks { display: grid; gap: 2px; }
 .sh-pick { border-top: 1px solid var(--line); }
 .sh-pick:last-child { border-bottom: 1px solid var(--line); }
-.sh-pick a {
+.sh-pick-link {
   display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 16px;
-  padding: 18px 0; text-decoration: none; color: var(--ink);
+  padding: 18px 0; color: var(--ink); text-decoration: none;
 }
-.sh-pick-n {
-  font-family: 'DM Serif Display', Georgia, serif; color: var(--accent);
-  font-size: 1.3rem; line-height: 1; min-width: 1.4em;
-}
-.sh-pick-title { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.55rem); line-height: 1.2; }
-.sh-pick a:hover .sh-pick-title { color: var(--accent); }
+.sh-pick-n { min-width: 1.4em; color: var(--accent); font: 400 1.3rem/1 var(--serif); }
+.sh-pick-title { font: 400 clamp(1.2rem, 2.4vw, 1.55rem)/1.2 var(--serif); }
+.sh-pick-link:hover .sh-pick-title { color: var(--accent); }
 .sh-pick-note { display: block; margin-top: 5px; color: var(--muted); font-size: .9rem; line-height: 1.55; }
 
-/* Topic clusters */
-.sh-clusters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 4px 0 0; }
-.sh-cluster {
-  border: 1px solid var(--line); background: var(--card); border-radius: 4px;
-  padding: 22px 22px 18px; min-width: 0;
-}
-.sh-cluster h3 { margin: 0 0 8px; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400; font-size: 1.5rem; line-height: 1.1; }
+/* Explore by rabbit hole */
+.sh-clusters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.sh-cluster { min-width: 0; padding-bottom: 18px; }
+.sh-cluster h3 { margin: 0 0 8px; font: 400 1.5rem/1.1 var(--serif); }
 .sh-cluster h3 a { color: var(--ink); text-decoration: none; }
 .sh-cluster h3 a:hover { color: var(--accent); }
 .sh-cluster-blurb { margin: 0 0 14px; color: var(--muted); font-size: .9rem; line-height: 1.6; }
-.sh-cluster-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
-.sh-cluster-list a { color: var(--ink); text-decoration: none; font-size: .95rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; }
+.sh-cluster-list { display: grid; gap: 8px; margin: 0 0 14px; }
+.sh-cluster-list a {
+  display: flex; align-items: flex-start; gap: 10px;
+  color: var(--ink); font-size: .95rem; line-height: 1.4; text-decoration: none;
+}
 .sh-cluster-list a:before {
-  content: '';
-  width: 11px;
-  height: 8px;
-  flex: 0 0 11px;
-  margin-top: .38em;
-  background: var(--accent);
+  content: ''; flex: 0 0 11px; width: 11px; height: 8px; margin-top: .38em; background: var(--accent);
   clip-path: polygon(0 43%, 64% 43%, 64% 0, 100% 50%, 64% 100%, 64% 57%, 0 57%);
 }
 .sh-cluster-list a:hover { color: var(--accent); }
-.sh-cluster-more { font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+.sh-cluster-more {
+  color: var(--accent); font-size: .74rem; font-weight: 800;
+  letter-spacing: .08em; text-decoration: none; text-transform: uppercase;
+}
 .sh-cluster-more:hover { text-decoration: underline; }
-.sh-cluster-loading { color: var(--muted); font-size: .88rem; margin: 0 0 12px; }
-
-/* Closing CTA */
-.sh-cta {
-  margin: 46px 0 0; border-top: 1px solid var(--line); padding-top: 26px;
-}
-.sh-cta p { color: var(--muted); font-size: 1rem; line-height: 1.7; margin: 0 0 16px; max-width: 620px; }
-.sh-cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
-.sh-btn {
-  display: inline-block; border: 1px solid var(--line); background: var(--card); color: var(--ink);
-  border-radius: 999px; padding: 11px 18px; font-size: .82rem; font-weight: 800; text-decoration: none; cursor: pointer;
-}
-.sh-btn:hover { border-color: var(--accent); color: var(--accent); }
-.sh-btn--solid { background: var(--accent); color: #fff; border-color: var(--accent); }
-.sh-btn--solid:hover { color: #fff; filter: brightness(1.06); }
+.sh-status { color: var(--muted); font-size: .92rem; }
 
 @media (max-width: 620px) {
   .sh-clusters { grid-template-columns: 1fr; }
 }
 </style>
 
-<div class="start-here">
-  <p class="sh-lede">New here? This is the shortest path into The Pwavwe Papers.</p>
+<div class="start-here page--wide">
+  <p class="page-lede">New here? This is the shortest path into The Pwavwe Papers.</p>
   <p class="sh-intro">The Papers are long-form essays on ideas, technology, business, travel and culture — written to chase a good question to its end. There's no wrong place to jump in, but if you'd like a map, start with a hand-picked essay below, then follow whichever rabbit hole pulls at you.</p>
 
-  <!-- ===================== EDITOR'S PICKS ==========================
-       [edit] Add your flagship essays here. Each entry is:
+  <!-- ===================== IF YOU ONLY READ THREE ==================
+       [edit] Hand-picked papers live in the FEATURED list in the
+       script at the bottom. Each entry is:
          { url: '/YYYY/MM/the-post-slug.html',
            title: 'The exact title',
            note: 'One line on why a newcomer should read it first.' }
        Copy a post's URL straight from its address bar. Leave the list
        empty ( var FEATURED = []; ) and this whole section stays hidden.
        ============================================================== -->
-
-  <section id="shFeaturedSection" style="display:none">
-    <h2 class="sh-h2">If you only read three</h2>
+  <section hidden id="shFeaturedSection">
+    <h2>If you only read three</h2>
     <p class="sh-sub">The essays I'd hand a first-time reader.</p>
-    <ol class="sh-picks" id="shPicks"></ol>
+    <ol class="page-list sh-picks" id="shPicks"></ol>
   </section>
 
   <section>
-    <h2 class="sh-h2">Explore by rabbit hole</h2>
+    <h2>Explore by rabbit hole</h2>
     <p class="sh-sub">The recurring threads. Each links to its full archive and shows what's newest.</p>
+    <p aria-live="polite" class="sh-status" id="shStatus" role="status">Gathering the latest from each thread…</p>
     <div class="sh-clusters" id="shClusters"></div>
   </section>
 
-  <section class="sh-cta">
+  <section class="page-next">
     <p>Essays land irregularly by design — no schedule, no filler. Get a note when there's something worth reading, or wander the full catalogue.</p>
-    <div class="sh-cta-row">
-      <button class="sh-btn sh-btn--solid" id="shSubscribe" type="button">Subscribe</button>
-      <a class="sh-btn" href="/p/all-papers.html">All papers</a>
-      <a class="sh-btn" href="/p/about.html">About</a>
-      <a class="sh-btn" href="/p/contact.html">Contact</a>
+    <div class="btn-row">
+      <button class="btn btn--solid" id="shSubscribe" type="button">Subscribe</button>
+      <a class="btn" href="/p/all-papers.html">All papers</a>
+      <a class="btn" href="/p/about.html">About</a>
+      <a class="btn" href="/p/contact.html">Contact</a>
     </div>
   </section>
 </div>
 
 <script>
 (function () {
-  // ---- [edit] Your hand-picked flagship essays (see comment above) ----
+  // ---- [edit] Hand-picked papers (see the comment above) ----
   var FEATURED = [
     {
       url: '/2026/08/smart-file-organizer-asks-before-moving-files.html',
@@ -158,7 +123,7 @@
     },
     {
       url: '/2026/07/why-ghana-is-one-of-africas-most.html',
-      title: 'Why Ghana Is One of Africa\u2019s Most Underrated Tourist Destinations',
+      title: 'Why Ghana Is One of Africa’s Most Underrated Tourist Destinations',
       note: 'Tourism, place and possibility from a writer trained to notice all three.'
     }
   ];
@@ -174,68 +139,82 @@
     { label: 'Travel',     title: 'Travel',       blurb: 'Where the industry is genuinely headed, and the pleasure of going.' }
   ];
 
-  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var COUNT_WORDS = ['', 'one', 'two', 'three', 'four', 'five'];
 
   function esc(s) {
     return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // ---------- Editor's picks ----------
+  // ---------- If you only read three ----------
   if (FEATURED.length) {
-    var picks = FEATURED.map(function (p, i) {
+    var featured = document.getElementById('shFeaturedSection');
+    featured.querySelector('h2').textContent = COUNT_WORDS[FEATURED.length]
+      ? 'If you only read ' + COUNT_WORDS[FEATURED.length]
+      : 'Where to begin';
+    document.getElementById('shPicks').innerHTML = FEATURED.map(function (p, i) {
       var note = p.note ? '<span class="sh-pick-note">' + esc(p.note) + '</span>' : '';
-      return '<li class="sh-pick"><a href="' + esc(p.url) + '">' +
+      return '<li class="sh-pick"><a class="sh-pick-link" href="' + esc(p.url) + '">' +
              '<span class="sh-pick-n">' + (i + 1) + '</span>' +
              '<span><span class="sh-pick-title">' + esc(p.title) + '</span>' + note + '</span></a></li>';
     }).join('');
-    document.getElementById('shPicks').innerHTML = picks;
-    document.getElementById('shFeaturedSection').style.display = '';
+    featured.hidden = false;
   }
 
   // ---------- Topic clusters ----------
+  // Cards appear as their topic loads, in the order above. The status line
+  // covers the wait, and says so if nothing could load.
   var wrap = document.getElementById('shClusters');
+  var status = document.getElementById('shStatus');
+  var pending = CLUSTERS.length, shown = 0;
+  function settle() {
+    pending--;
+    if (pending > 0 || !status) return;
+    if (shown) status.remove();
+    else status.innerHTML = 'The topic lists could not load just now. <a href="/p/all-papers.html">Browse all papers</a> instead.';
+  }
+
   CLUSTERS.forEach(function (c) {
     var labelUrl = '/search/label/' + encodeURIComponent(c.label);
     var card = document.createElement('div');
-    card.className = 'sh-cluster';
-    card.style.display = 'none'; // revealed once we confirm it has posts
-    card.innerHTML =
-      '<h3><a href="' + esc(labelUrl) + '">' + esc(c.title) + '</a></h3>' +
-      '<p class="sh-cluster-blurb">' + esc(c.blurb) + '</p>' +
-      '<div class="sh-cluster-loading">Loading\u2026</div>';
+    card.className = 'page-card sh-cluster';
+    card.hidden = true;
     wrap.appendChild(card);
 
-    fetch('/feeds/posts/default/-/' + encodeURIComponent(c.label) + '?alt=json&max-results=3')
-      .then(function (r) { return r.json(); })
+    fetch('/feeds/posts/summary/-/' + encodeURIComponent(c.label) + '?alt=json&max-results=2')
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (json) {
-        var entries = (json.feed && json.feed.entry) || [];
         var items = [];
-        for (var n = 0; n < entries.length && items.length < 2; n++) {
-          var e = entries[n], href = '';
+        ((json.feed && json.feed.entry) || []).forEach(function (e) {
+          var href = '';
           (e.link || []).forEach(function (l) { if (l.rel === 'alternate') href = l.href; });
-          if (!href) continue;
-          var t = (e.title && e.title.$t) || 'Untitled paper';
-          items.push('<li><a href="' + esc(href) + '">' + esc(t) + '</a></li>');
-        }
-        if (!items.length) { card.remove(); return; } // no posts under this label — drop the card
-        card.querySelector('.sh-cluster-loading').outerHTML =
-          '<ul class="sh-cluster-list">' + items.join('') + '</ul>' +
-          '<a class="sh-cluster-more" href="' + esc(labelUrl) + '">Browse all ' + esc(c.title) + ' \u2192</a>';
-        card.style.display = '';
+          if (href && items.length < 2) {
+            items.push('<li><a href="' + esc(href) + '">' + esc((e.title && e.title.$t) || 'Untitled paper') + '</a></li>');
+          }
+        });
+        if (!items.length) { card.remove(); return; } // no posts under this label
+        card.innerHTML =
+          '<h3><a href="' + esc(labelUrl) + '">' + esc(c.title) + '</a></h3>' +
+          '<p class="sh-cluster-blurb">' + esc(c.blurb) + '</p>' +
+          '<ul class="page-list sh-cluster-list">' + items.join('') + '</ul>' +
+          '<a class="sh-cluster-more" href="' + esc(labelUrl) + '">Browse all ' + esc(c.title) +
+          ' <span aria-hidden="true">→</span></a>';
+        card.hidden = false;
+        shown++;
       })
-      .catch(function () { card.remove(); });
+      .catch(function () { card.remove(); })
+      .then(settle);
   });
 
-  // ---------- Subscribe button → jump to the footer newsletter ----------
+  // ---------- Subscribe button → the newsletter form in the site footer ----------
   var subBtn = document.getElementById('shSubscribe');
   if (subBtn) {
     subBtn.addEventListener('click', function () {
       var field = document.getElementById('fp-footer-email');
-      if (field) {
-        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(function () { field.focus(); }, 400);
-      }
+      if (!field) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      field.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      setTimeout(function () { field.focus({ preventScroll: true }); }, reduce ? 0 : 400);
     });
   }
 })();

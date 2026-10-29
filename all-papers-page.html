@@ -2,68 +2,65 @@
      THE PWAVWE PAPERS — "All Papers" index page
      ------------------------------------------------------------
      HOW TO INSTALL
-     1. Blogger → Pages → New page
+     1. Blogger → Pages → New page (or open the existing All Papers page)
      2. Title the page:  All Papers
      3. Click the pencil/⋮ and switch the editor to  HTML view
         (top-left "HTML"/"< >" toggle) — do NOT use Compose view
      4. Paste EVERYTHING in this file, then Publish
-     5. Copy the published URL (usually /p/all-papers.html) and add
-        it to your nav / footer "Archive" link.
+     5. The published URL is /p/all-papers.html — the theme already
+        links it from the header, mobile menu and footer.
 
-     It lists every post automatically from your blog feed, groups
+     It lists every post automatically from the blog feed, groups
      them by year, and filters as you type. Nothing to maintain —
      new posts appear here the moment you publish them.
+
+     STYLES: the theme supplies the page title, .page-lede,
+     .page-list, .page-next and .btn. Only the list layout is below.
      ============================================================ -->
 
 <style>
-/* Strip post-only chrome so this page reads as a clean archive */
-.article-byline, .author-box, .comments-wrap, .article-aside, .article-hero { display: none !important; }
-.article-layout { grid-template-columns: minmax(0, 960px) !important; }
-
-.papers-index { font-family: 'Inter', Arial, sans-serif; color: var(--ink); }
-.papers-index * { box-sizing: border-box; }
-.pi-intro { color: var(--muted); font-size: 1rem; line-height: 1.7; margin: 0 0 26px; max-width: 640px; }
 .pi-tools { margin: 0 0 20px; }
 .pi-search {
   width: 100%; border: 1px solid var(--line); background: var(--card); color: var(--ink);
-  border-radius: 999px; padding: 13px 18px; outline: none;
-  font: 500 1rem 'Inter', Arial, sans-serif;
+  border-radius: 999px; padding: 13px 18px; outline: none; font: 500 1rem var(--sans);
 }
 .pi-search:focus { border-color: var(--accent); }
 .pi-count {
-  display: block; margin-top: 10px; color: var(--muted);
+  display: block; min-height: 1.4em; margin-top: 10px; color: var(--muted);
   font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
 }
 .pi-year {
-  margin: 34px 0 6px; font-family: 'DM Serif Display', Georgia, serif; font-weight: 400;
-  font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1; color: var(--ink);
-  border-bottom: 1px solid var(--line); padding-bottom: 12px;
+  margin: 34px 0 6px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
+  font: 400 clamp(1.8rem, 4vw, 2.6rem)/1 var(--serif);
 }
-.pi-list { list-style: none; margin: 0; padding: 0; }
 .pi-item { border-bottom: 1px solid var(--line); }
 .pi-link {
   display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 16px;
-  padding: 16px 0; text-decoration: none; color: var(--ink);
+  padding: 16px 0; color: var(--ink); text-decoration: none;
 }
 .pi-link:hover .pi-title { color: var(--accent); }
-.pi-title { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(1.2rem, 2.4vw, 1.6rem); line-height: 1.15; }
-.pi-tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.pi-title { font: 400 clamp(1.2rem, 2.4vw, 1.6rem)/1.15 var(--serif); }
+.pi-tags { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 6px; }
 .pi-tag { color: var(--accent); font-size: .64rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
 .pi-date { color: var(--muted); font-size: .78rem; font-weight: 600; white-space: nowrap; }
-.pi-status { color: var(--muted); font-size: .95rem; padding: 20px 0; }
+.pi-status { padding: 20px 0; color: var(--muted); font-size: .95rem; }
+.pi-status .btn { margin-left: 8px; }
 @media (max-width: 560px) {
   .pi-link { grid-template-columns: 1fr; gap: 4px; }
   .pi-date { order: -1; }
 }
 </style>
 
-<div class="papers-index">
-  <p class="pi-intro">Everything published so far, newest first. Filter by title or topic.</p>
+<div class="papers-index page--wide">
+  <p class="page-lede">Every paper so far, newest first.</p>
   <div class="pi-tools">
-    <input aria-label="Filter papers" autocomplete="off" class="pi-search" id="piSearch" placeholder="Filter papers — try a title or a topic…" type="search"/>
-    <span class="pi-count" id="piCount"></span>
+    <input aria-controls="piBody" aria-label="Filter papers by title or topic" autocomplete="off" class="pi-search" id="piSearch" placeholder="Filter papers — try a title or a topic…" type="search"/>
+    <span aria-live="polite" class="pi-count" id="piCount" role="status"></span>
   </div>
   <div id="piBody"><p class="pi-status">Gathering the papers…</p></div>
+  <div class="page-next">
+    <p>New here? <a href="/p/start-here.html">Start with the hand-picked papers</a>, or <a href="/p/about.html">read what the Papers are about</a>.</p>
+  </div>
 </div>
 
 <script>
@@ -73,12 +70,15 @@
   var countEl = document.getElementById('piCount');
   var searchEl = document.getElementById('piSearch');
   var all = [];
+  var rendered = false;
 
   function esc(s) {
     return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  function papers(n) { return n + (n === 1 ? ' paper' : ' papers'); }
 
+  // The same section-plus-topic choice the theme makes for its cards.
   function displayLabels(labels) {
     var sectionOrder = ['Travel', 'Culture', 'Business', 'Technology', 'Life', 'Ideas'];
     var sectionSet = {}, seen = {}, unique = [];
@@ -102,22 +102,31 @@
     return chosen;
   }
 
-  // Blogger caps each feed request at 150; paginate until we've got them all.
+  // Blogger caps each feed request at 150; page through until we have them
+  // all. The summary feed carries everything this list needs and is lighter.
   function load(start) {
-    fetch('/feeds/posts/default?alt=json&max-results=150&start-index=' + start)
-      .then(function (r) { return r.json(); })
+    body.setAttribute('aria-busy', 'true');
+    fetch('/feeds/posts/summary?alt=json&max-results=150&start-index=' + start)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(function (json) {
         var e = (json.feed && json.feed.entry) || [];
         all = all.concat(e);
-        if (e.length === 150) { load(start + 150); }
-        else { render(); }
+        if (e.length === 150) load(start + 150);
+        else render(false);
       })
       .catch(function () {
-        body.innerHTML = '<p class="pi-status">Could not load the archive right now \u2014 please refresh.</p>';
+        if (all.length) { render(true); return; } // show what did load
+        body.removeAttribute('aria-busy');
+        body.innerHTML = '<p class="pi-status">The archive could not load just now.' +
+          '<button class="btn" id="piRetry" type="button">Try again</button></p>';
+        document.getElementById('piRetry').addEventListener('click', function () {
+          body.innerHTML = '<p class="pi-status">Gathering the papers…</p>';
+          load(1);
+        });
       });
   }
 
-  function render() {
+  function render(partial) {
     var byYear = {}, order = [], total = 0;
     all.forEach(function (en) {
       var link = '';
@@ -128,43 +137,47 @@
       var d = pub ? new Date(pub) : null;
       var year = d ? d.getFullYear() : 'Undated';
       var labels = [];
-      (en.category || []).forEach(function (c) { if (c.term) labels.push(c.term); });
+      (en.category || []).forEach(function (c) { if (c.term && c.term !== 'The Pwavwe Papers') labels.push(c.term); });
       if (!byYear[year]) { byYear[year] = []; order.push(year); }
-      byYear[year].push({ link: link, title: title, d: d, labels: labels });
+      byYear[year].push({ link: link, title: title, d: d, labels: labels, shown: displayLabels(labels) });
       total++;
     });
 
+    body.removeAttribute('aria-busy');
     if (!total) { body.innerHTML = '<p class="pi-status">No papers yet.</p>'; return; }
     order.sort(function (a, b) { return (Number(b) || 0) - (Number(a) || 0); });
 
     var html = '';
     order.forEach(function (year) {
       html += '<section class="pi-group" data-group>';
-      html += '<h2 class="pi-year">' + year + '</h2><ul class="pi-list">';
+      html += '<h2 class="pi-year">' + year + '</h2><ul class="page-list">';
       byYear[year].forEach(function (p) {
         var dateStr = p.d ? (p.d.getDate() + ' ' + MONTHS[p.d.getMonth()]) : '';
-        var hay = (p.title + ' ' + p.labels.join(' ')).toLowerCase();
+        // Match the full label names and the short ones shown (AI).
+        var hay = (p.title + ' ' + p.labels.join(' ') + ' ' + p.shown.join(' ')).toLowerCase();
         html += '<li class="pi-item" data-item data-search="' + esc(hay) + '">';
         html += '<a class="pi-link" href="' + esc(p.link) + '"><span>';
         html += '<span class="pi-title">' + esc(p.title) + '</span>';
-        var shownLabels = displayLabels(p.labels);
-        if (shownLabels.length) {
+        if (p.shown.length) {
           html += '<span class="pi-tags">';
-          shownLabels.forEach(function (t) { html += '<span class="pi-tag">' + esc(t) + '</span>'; });
+          p.shown.forEach(function (t) { html += '<span class="pi-tag">' + esc(t) + '</span>'; });
           html += '</span>';
         }
         html += '</span><span class="pi-date">' + dateStr + '</span></a></li>';
       });
       html += '</ul></section>';
     });
+    html += '<p class="pi-status" hidden id="piNoMatch"></p>';
+    if (partial) html += '<p class="pi-status">Some older papers could not load. Refresh the page to try again.</p>';
 
     body.innerHTML = html;
-    updateCount(total, total);
-    searchEl.addEventListener('input', onFilter);
+    rendered = true;
+    applyFilter(); // honours anything typed while the list was loading
   }
 
-  function onFilter() {
-    var q = this.value.trim().toLowerCase();
+  function applyFilter() {
+    if (!rendered) return;
+    var q = searchEl.value.trim().toLowerCase();
     var shown = 0, total = 0;
     Array.prototype.forEach.call(body.querySelectorAll('[data-item]'), function (it) {
       total++;
@@ -173,19 +186,21 @@
       if (match) shown++;
     });
     Array.prototype.forEach.call(body.querySelectorAll('[data-group]'), function (g) {
-      var vis = 0;
+      var visible = 0;
       Array.prototype.forEach.call(g.querySelectorAll('[data-item]'), function (it) {
-        if (it.style.display !== 'none') vis++;
+        if (it.style.display !== 'none') visible++;
       });
-      g.style.display = vis ? '' : 'none';
+      g.style.display = visible ? '' : 'none';
     });
-    updateCount(shown, total);
+    var none = document.getElementById('piNoMatch');
+    if (none) {
+      none.hidden = shown > 0;
+      if (!shown) none.textContent = 'No papers match “' + searchEl.value.trim() + '”. Try a shorter word or a topic.';
+    }
+    countEl.textContent = shown === total ? papers(total) : shown + ' of ' + papers(total);
   }
 
-  function updateCount(shown, total) {
-    countEl.textContent = (shown === total) ? (total + ' papers') : (shown + ' of ' + total + ' papers');
-  }
-
+  searchEl.addEventListener('input', applyFilter);
   load(1);
 })();
 </script>
