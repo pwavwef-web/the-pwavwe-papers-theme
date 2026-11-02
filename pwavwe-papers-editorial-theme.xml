@@ -8,6 +8,11 @@
       xmlns:expr='http://www.google.com/2005/gml/expr'>
 <head>
   <meta content='width=device-width, initial-scale=1, viewport-fit=cover' name='viewport'/>
+  <!-- Also prints og:url, og:title, og:description (the Search Description, or
+       empty without one) and og:image. Its og:image is a 1200×630 copy of the
+       paper's first image served through Google's image proxy: small, and
+       readable by Facebook even when the original is on Wikimedia, which turns
+       Facebook's crawler away. -->
   <b:include data='blog' name='all-head-content'/>
   <!-- Put the page/post name first so it survives search-result truncation. -->
   <b:if cond='data:blog.pageType == &quot;item&quot; or data:blog.pageType == &quot;static_page&quot;'>
@@ -26,6 +31,7 @@
   <b:if cond='!data:blog.metaDescription'>
     <meta content='The Pwavwe Papers — long-form essays on ideas, technology, business, travel and culture by Francis Pwavwe. Curiosity over certainty.' name='description'/>
   </b:if>
+  <meta content='Francis Pwavwe' name='author'/>
 
   <!-- Browser and home-screen icons. The PNG is versioned with the theme so the
        Blogger template always points at a stable, cacheable asset. -->
@@ -39,6 +45,7 @@
 
   <!-- Social cards (Twitter/X falls back to og: tags for image + url) -->
   <meta content='summary_large_image' name='twitter:card'/>
+  <meta content='@PwavweF' name='twitter:creator'/>
   <b:if cond='data:blog.pageName'>
     <meta expr:content='data:blog.pageName' name='twitter:title'/>
   <b:else/>
@@ -55,6 +62,7 @@
   <meta expr:content='data:blog.title' property='og:site_name'/>
   <b:if cond='data:blog.pageType == &quot;item&quot;'>
     <meta content='article' property='og:type'/>
+    <meta content='https://pwavwe.com/' property='article:author'/>
   <b:else/>
     <meta content='website' property='og:type'/>
   </b:if>
@@ -69,20 +77,23 @@
     <meta content='The Pwavwe Papers — essays on ideas, technology, business, travel and culture, written by Francis Pwavwe. Curiosity over certainty.' property='og:description'/>
   </b:if>
   <b:if cond='data:blog.postImageUrl'>
-    <!-- On a post: ask Blogger's image proxy for a social-card-sized crop. -->
-    <meta expr:content='resizeImage(data:blog.postImageUrl, 1200, &quot;1200:630&quot;)' property='og:image'/>
+    <!-- On a paper with an image, all-head-content's proxied og:image above is
+         the only one, and X falls back to it. No second og:image with the
+         original URL: Facebook can't fetch Wikimedia originals, and full-size
+         originals can pass WhatsApp's size limit. These tags describe it. -->
     <meta content='1200' property='og:image:width'/>
     <meta content='630' property='og:image:height'/>
     <meta expr:content='data:blog.pageName' property='og:image:alt'/>
-    <meta expr:content='resizeImage(data:blog.postImageUrl, 1200, &quot;1200:630&quot;)' name='twitter:image'/>
-    <meta expr:content='data:blog.pageName' name='twitter:image:alt'/>
   <b:else/>
-    <!-- Stable site card for the homepage, label pages and image-less posts. -->
-    <meta content='https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/pwavwe-papers-default-share.png' property='og:image'/>
+    <!-- Stable site card for the homepage, label pages and image-less posts.
+         A JPEG of about 80 KB: WhatsApp drops preview images much over 300 KB,
+         and the PNG original is 1.1 MB. -->
+    <meta content='https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/pwavwe-papers-default-share.jpg' property='og:image'/>
+    <meta content='image/jpeg' property='og:image:type'/>
     <meta content='1200' property='og:image:width'/>
     <meta content='630' property='og:image:height'/>
     <meta content='The Pwavwe Papers — Essays, ideas &amp; rabbit holes' property='og:image:alt'/>
-    <meta content='https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/pwavwe-papers-default-share.png' name='twitter:image'/>
+    <meta content='https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/pwavwe-papers-default-share.jpg' name='twitter:image'/>
     <meta content='The Pwavwe Papers — Essays, ideas &amp; rabbit holes' name='twitter:image:alt'/>
   </b:if>
 
@@ -99,7 +110,7 @@
       "name": "The Pwavwe Papers",
       "description": "Long-form essays on ideas, technology, business, travel and culture by Francis Pwavwe.",
       "inLanguage": "en",
-      "publisher": { "@id": "https://blogs.pwavwe.com/#person" },
+      "publisher": { "@id": "https://pwavwe.com/#francis" },
       "potentialAction": {
         "@type": "SearchAction",
         "target": { "@type": "EntryPoint", "urlTemplate": "https://blogs.pwavwe.com/search?q={search_term_string}" },
@@ -108,10 +119,20 @@
     },
     {
       "@type": "Person",
-      "@id": "https://blogs.pwavwe.com/#person",
+      "@id": "https://pwavwe.com/#francis",
       "name": "Francis Pwavwe",
-      "url": "https://pwavwe.com",
-      "sameAs": [ "https://pwavwe.com" ]
+      "url": "https://pwavwe.com/",
+      "image": "https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/francis-pwavwe.jpg",
+      "jobTitle": "Founder, Pwavwe Studio",
+      "description": "Francis Pwavwe builds websites, web applications and AI-assisted systems from Cape Coast, Ghana.",
+      "worksFor": { "@type": "Organization", "@id": "https://pwavwe.com/studio#studio", "name": "Pwavwe Studio", "url": "https://pwavwe.com/studio" },
+      "alumniOf": { "@type": "CollegeOrUniversity", "name": "University of Cape Coast" },
+      "sameAs": [
+        "https://pwavwe.com/",
+        "https://www.linkedin.com/in/francis-pwavwe",
+        "https://github.com/pwavwef-web",
+        "https://x.com/PwavweF"
+      ]
     }
   ]
 }</script>
@@ -413,6 +434,7 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
   background: var(--card); color: var(--accent); font-weight: 750;
 }
 .byline-audio:hover { border-color: var(--accent); }
+.byline-author:hover strong { color: var(--accent); }
 .byline-audio svg {
   width: 14px; height: 14px; fill: none; stroke: currentColor;
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
@@ -559,6 +581,27 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
   font: .9rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 .post-content code { font-size: .88em; }
+/* Related case study at the end of a paper. The post adds one line of HTML,
+   <p class="case-study-link"><a href="https://pwavwe.com/work/comitia">…</a></p>
+   (see CASE-STUDY-LINKS.md), and the script fills in the project's summary. */
+.post-content .case-study-link { margin: 2.6em 0 0; }
+.post-content .case-study-link a {
+  display: block; padding: 18px 20px 20px; border: 1px solid var(--line);
+  border-top: 3px solid var(--accent); border-radius: 0 0 8px 8px;
+  background: var(--card); color: var(--ink); text-decoration: none;
+  font: 750 1rem/1.45 var(--sans);
+}
+.post-content .case-study-link a:hover { border-color: var(--accent); }
+.case-study-link span { display: block; }
+.case-study-link .case-study-kicker {
+  margin-bottom: 6px; color: var(--accent); font-size: .68rem; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.case-study-link .case-study-title { font: 400 1.45rem/1.15 var(--serif); }
+.case-study-link .case-study-summary {
+  margin-top: 6px; color: var(--muted); font-size: .9rem; font-weight: 450; line-height: 1.55;
+}
+.case-study-link .case-study-cta { margin-top: 12px; color: var(--accent); font-size: .82rem; }
 .article-footer {
   width: min(calc(100% - 40px), var(--reading)); margin: 48px auto 0;
   border-top: 1px solid var(--line); padding-top: 26px;
@@ -567,12 +610,19 @@ html.dark .icon-sun, #menuToggle[aria-expanded='true'] .icon-close { display: bl
   display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start;
   background: var(--card); border: 1px solid var(--line); padding: 24px;
 }
-.author-mark {
-  width: 54px; height: 54px; border-radius: 50%; background: var(--accent-solid); color: white;
-  display: grid; place-items: center; font-family: var(--serif); font-size: 1.35rem;
+.author-photo {
+  width: 72px; height: 72px; border-radius: 50%; object-fit: cover; background: var(--paper-2);
 }
 .author-box .author-name { margin: 0 0 6px; font: 400 1.4rem/1 var(--serif); }
 .author-box p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.6; }
+.author-box .author-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 12px; }
+.author-links a { color: var(--accent); font-weight: 750; }
+.author-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Phones: photo above the note, so the bio gets the card's full width. */
+@media (max-width: 640px) {
+  .author-box { grid-template-columns: 1fr; gap: 14px; }
+  .author-photo { width: 64px; height: 64px; }
+}
 /* On a paper, the author note and the newsletter form share one card. */
 body.item .paper-end {
   border: 1px solid var(--line); border-radius: 8px; background: var(--card); overflow: hidden;
@@ -1359,7 +1409,7 @@ summary:focus-visible,
                   <p class='article-dek'><data:blog.metaDescription/></p>
                 </b:if>
                 <div class='article-byline'>
-                  <span>By <strong>Francis Pwavwe</strong></span>
+                  <span>By <a class='byline-author' href='https://pwavwe.com/' rel='author'><strong>Francis Pwavwe</strong></a></span>
                   <span>•</span>
                   <span class='post-date'><data:post.timestamp/></span>
                   <span>•</span>
@@ -1415,15 +1465,19 @@ summary:focus-visible,
               </div>
 
               <!-- A paper ends once: who wrote it and how to get the next one (one
-                   card), then what to read next, then the discussion. -->
+                   card), then what to read next, then the discussion. The author
+                   note links to pwavwe.com and the Studio on every paper. -->
               <footer class='article-footer'>
                 <div class='paper-end'>
                   <div class='author-box' itemprop='author' itemscope='itemscope' itemtype='https://schema.org/Person'>
-                    <div class='author-mark'>FP</div>
+                    <img alt='Francis Pwavwe' class='author-photo' decoding='async' height='72' itemprop='image' loading='lazy' src='https://raw.githubusercontent.com/pwavwef-web/the-pwavwe-papers-theme/main/assets/francis-pwavwe.jpg' width='72'/>
                     <div>
                       <h2 class='author-name' itemprop='name'>Francis Pwavwe</h2>
-                      <p>Tourism graduate, builder, researcher and chronic follower of interesting rabbit holes. The Pwavwe Papers is where those threads become essays.</p>
-                      <link href='https://pwavwe.com' itemprop='url'/>
+                      <p itemprop='description'>Francis Pwavwe builds websites, web applications and AI-assisted systems from Cape Coast, Ghana. Through Pwavwe Studio he has shipped election, transport, campus-access and career products used by real organisations. BSc Tourism Management, University of Cape Coast.</p>
+                      <p class='author-links'>
+                        <a href='https://pwavwe.com/' itemprop='url'>Portfolio at pwavwe.com →</a>
+                        <a href='https://pwavwe.com/studio'>Work with Pwavwe Studio →</a>
+                      </p>
                     </div>
                   </div>
                   <b:if cond='data:blog.pageType == &quot;item&quot;'>
@@ -2095,12 +2149,45 @@ summary:focus-visible,
       byline.appendChild(listen);
     }
 
+    // A related case study on pwavwe.com, added at the end of a paper as
+    // <p class="case-study-link"><a href="https://pwavwe.com/work/SLUG">…</a></p>.
+    // Known projects get their name and one-line summary; any other /work/ page
+    // keeps the link's own text as its title.
+    (function caseStudyLinks() {
+      var studies = {
+        'comitia': ['Comitia', 'A managed online elections platform, from voter setup to verified public results.'],
+        'vitaforge-ai': ['VitaForge AI', 'A student-first AI career platform for stronger, more deliberate job applications.'],
+        'smg-transport-agency': ['SMG Transport Agency', 'An intercity travel booking workflow covering route discovery, seats, payment and QR tickets.'],
+        'ucc-src-app': ['UCC SRC App', 'A clearer digital service channel between student leadership and daily campus life.'],
+        'hallkey': ['HallKey', 'A smart hall key-access prototype designed to reduce queues and improve accountability.'],
+        'az-learner': ['AZ Learner', 'A student app that put UCC academic life in one place: an AI study assistant, timetable, notes, GPA tools and campus services.']
+      };
+      Array.prototype.forEach.call(content.querySelectorAll('.case-study-link a[href*="pwavwe.com/work/"]'), function (link) {
+        var slug = link.pathname.replace(/\/+$/, '').replace(/\.html$/, '').split('/').pop();
+        var study = studies[slug];
+        var parts = [
+          ['case-study-kicker', 'Pwavwe Studio case study'],
+          ['case-study-title', study ? study[0] : (link.textContent || '').trim()],
+          ['case-study-summary', study ? study[1] : ''],
+          ['case-study-cta', study ? 'Read the case study →' : '']
+        ];
+        link.textContent = '';
+        parts.forEach(function (part) {
+          if (!part[1]) return;
+          var span = document.createElement('span');
+          span.className = part[0];
+          span.textContent = part[1];
+          link.appendChild(span);
+        });
+      });
+    })();
+
     // The opening paragraph is set slightly larger to ease the reader in.
     (function markLede() {
       var paragraphs = content.querySelectorAll('p');
       for (var i = 0; i < paragraphs.length; i++) {
         var p = paragraphs[i];
-        if (p.closest('figure, blockquote, li, table, .pwavwe-audio-embed')) continue;
+        if (p.closest('figure, blockquote, li, table, .pwavwe-audio-embed, .case-study-link')) continue;
         if ((p.textContent || '').trim().length < 60 || !p.getClientRects().length) continue;
         p.classList.add('lede');
         break;
@@ -2128,7 +2215,8 @@ summary:focus-visible,
       var image = metaOf('meta[property="og:image"]') || (heroImg && heroImg.src) || '';
       var published = metaOf('meta[itemprop="datePublished"]');
       var modified = metaOf('meta[itemprop="dateModified"]') || published;
-      var author = { '@type': 'Person', name: 'Francis Pwavwe', url: 'https://pwavwe.com' };
+      // Same @id as the Person on pwavwe.com, so search engines join the two.
+      var author = { '@type': 'Person', '@id': 'https://pwavwe.com/#francis', name: 'Francis Pwavwe', url: 'https://pwavwe.com/' };
 
       var post = {
         '@context': 'https://schema.org',
