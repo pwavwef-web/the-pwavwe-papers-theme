@@ -4,11 +4,13 @@ The theme and page files are ready locally. Blogger pages do not update from Git
 
 For the audio edition update, upload the theme and republish the existing Privacy page. Follow [AUDIO-PUBLISHING.md](AUDIO-PUBLISHING.md) when adding a read version to a paper.
 
-For the author box and share card update, only the theme changes: steps 0–2 below, then the checks under **Author box, case studies and share previews**. No page needs republishing. Follow [CASE-STUDY-LINKS.md](CASE-STUDY-LINKS.md) to end a paper with a case study.
+For the theme release of 5 November 2026 (author card, case-study cards, share-preview fixes, a 404 page with search, and comment links that open the discussion), only the theme changes: steps 0–2 below, then the checks under **Author box, case studies and share previews** and **Theme release of 5 November 2026**. No page needs republishing. Follow [CASE-STUDY-LINKS.md](CASE-STUDY-LINKS.md) to end a paper with a case study.
+
+To see which theme the live site runs, use `python scripts/check-theme.py --live`. It compares the `pwavwe-theme-version` stamp in the theme's head with the live site's; a site that predates the stamp reports none.
 
 0. If anything was edited in Blogger's theme editor since the last upload, take **Theme → Backup** and run `python scripts/compare-live.py <downloaded.xml>`. Copy any live-only changes into the local theme first, or the upload will erase them.
-1. Commit and push this repository, and merge the release branch into `main`, so the social card (`assets/pwavwe-papers-default-share.jpg`), the author photo (`assets/francis-pwavwe.jpg`) and the Apple touch icon are available at their stable GitHub URLs. The theme loads them from `raw.githubusercontent.com/…/main/assets/`, so they show as broken images until they are on `main`. Open each URL in a browser before uploading the theme.
-2. In Blogger, upload `pwavwe-papers-editorial-theme.xml` from **Theme → Restore → Upload**.
+1. Commit and push this repository, and merge the release branch into `main`, so the social card (`assets/pwavwe-papers-default-share.jpg`), the author photo (`assets/francis-pwavwe.jpg`) and the Apple touch icon are available at their stable GitHub URLs. The theme loads them from `raw.githubusercontent.com/…/main/assets/`, so they show as broken images until they are on `main`. `python scripts/check-theme.py --live` checks each URL.
+2. Set the `pwavwe-theme-version` meta in the theme's head to the release date and run `python scripts/check-theme.py`. It must report **All checks passed**: Blogger rejects a theme that is not well-formed XML, and a script that does not parse breaks the whole page. Then upload `pwavwe-papers-editorial-theme.xml` in Blogger from **Theme → Restore → Upload**.
    - The homepage cards use Blogger's `snippet()` expression for a longer summary. If Blogger refuses to save the theme with an error about `snippet`, replace both `<b:eval expr='snippet(data:post.body, …)'/>` lines in the theme with `<data:post.snippet/>` and upload again. Cards still drop the photo credit and audio text, but most will then show no summary.
 3. Republish all five pages in Blogger HTML view, because their styles now come from the theme:
    - `start-here-page.html`
@@ -69,11 +71,18 @@ For the author box and share card update, only the theme changes: steps 0–2 be
 - Paste a paper's URL into Facebook Sharing Debugger, LinkedIn Post Inspector and a WhatsApp chat to yourself. Each shows the title, description and image. Use **Scrape Again** in the Facebook debugger to replace its cached preview.
 - Rich Results Test on a paper finds a BlogPosting whose author is Francis Pwavwe with `@id` https://pwavwe.com/#francis.
 
+### Theme release of 5 November 2026
+
+- `python scripts/check-theme.py --live` reports the live theme version as `2026-11-05`.
+- Open a comment's link from Blogger's comment email or the comments feed (it ends in `?showComment=…#c…`). The paper opens with **Read or leave a comment** expanded and that comment just below the header. A paper URL ending in `#comments` opens the discussion too. A plain paper URL still keeps the comments closed.
+- An address that does not exist, such as `/no-such-paper.html`, shows **This page wandered off.** as its heading, a search box that returns results, and **Homepage** and **All papers** buttons. The browser tab reads **Page not found | The Pwavwe Papers**. At 390px the search box and button fit on one line.
+- After a test sign-up, the same address in the same browser says it is already on the list, and a different address can still subscribe.
+
 ### Share previews that need a fix in Blogger, not the theme
 
-Checked against the live site on 2 November 2026.
+Checked against the live site on 2 November 2026; the homepage description rechecked on 5 November.
 
-- **Set the blog's description** in **Settings → Basic → Description**. Blogger prints it as the homepage's `og:description`, which is empty today.
+- **Set the blog's search description** in **Settings → Meta tags**: turn on **Enable search description**, then fill in **Search description**. Blogger prints it as the homepage's `og:description`. Today that tag is empty and comes before the theme's generic fallback, so a shared homepage link may show no summary. (**Settings → Basic → Description** is a different field: it is already set and is the homepage headline, "The Things That Matter".) After saving, open a paper that has no Search Description of its own and check that no standfirst appears under its title.
 - **Add a Search Description** (post editor → **Post settings → Search Description**) to these papers. Without one, Blogger prints an empty `og:description` ahead of the theme's site-wide line, so Facebook and LinkedIn may show no summary. Each is at `blogs.pwavwe.com/<year>/<month>/<slug>.html`:
   - 2026/04 what-does-tourism-management-degree
   - 2026/06 echoes-of-1999-is-generative-ai-boom, life-game-or-play

@@ -17,6 +17,8 @@
   <!-- Put the page/post name first so it survives search-result truncation. -->
   <b:if cond='data:blog.pageType == &quot;item&quot; or data:blog.pageType == &quot;static_page&quot;'>
     <title><data:blog.pageName/> | The Pwavwe Papers</title>
+  <b:elseif cond='data:blog.pageType == &quot;error_page&quot;'/>
+    <title>Page not found | The Pwavwe Papers</title>
   <b:elseif cond='data:blog.url == data:blog.homepageUrl'/>
     <title>The Pwavwe Papers — Essays on ideas, technology, business, travel &amp; culture</title>
   <b:else/>
@@ -32,6 +34,10 @@
     <meta content='The Pwavwe Papers — long-form essays on ideas, technology, business, travel and culture by Francis Pwavwe. Curiosity over certainty.' name='description'/>
   </b:if>
   <meta content='Francis Pwavwe' name='author'/>
+  <!-- Release stamp. Change it with every upload. The live check in
+       scripts/check-theme.py compares it with the site to show which theme
+       is installed. -->
+  <meta content='2026-11-05' name='pwavwe-theme-version'/>
 
   <!-- Browser and home-screen icons. The PNG is versioned with the theme so the
        Blogger template always points at a stable, cacheable asset. -->
@@ -634,6 +640,8 @@ body.item .paper-end .author-box { border: 0; background: none; }
   width: min(calc(100% - 40px), var(--reading)); margin: 54px auto 0;
   border-top: 1px solid var(--line); padding-top: 30px;
 }
+/* A comment permalink scrolls its comment clear of the sticky header. */
+.comments-wrap, .comments-wrap [id] { scroll-margin-top: 100px; }
 .comments-gate { border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
 .comments-gate summary {
   display: flex; align-items: center; justify-content: space-between; gap: 18px;
@@ -939,6 +947,9 @@ body.item .paper-end .author-box { border: 0; background: none; }
 .error-wrap { text-align: center; padding: 60px 0 40px; }
 .error-title { margin: 14px 0 12px; font: 400 clamp(2.4rem, 6vw, 4.4rem)/1 var(--serif); }
 .error-wrap p { max-width: 520px; margin: 0 auto 22px; color: var(--muted); line-height: 1.6; }
+.error-search { display: flex; gap: 10px; max-width: 460px; margin: 0 auto 16px; }
+.error-search .btn { flex: none; }
+.error-links { justify-content: center; }
 
 /* Hide the body's own lead image so it doesn't duplicate the theme hero. A lead
    figure keeps its caption, so photo credits stay visible without JavaScript;
@@ -1293,9 +1304,16 @@ summary:focus-visible,
               <section class='index-section'>
                 <div class='wrap error-wrap'>
                   <span class='eyebrow'>Error 404</span>
-                  <h2 class='error-title'>This page wandered off.</h2>
-                  <p>The paper you’re looking for moved, or never existed. Try the homepage, or search for what you had in mind.</p>
-                  <a class='read-link' expr:href='data:blog.homepageUrl'>← Back to the homepage</a>
+                  <h1 class='error-title'>This page wandered off.</h1>
+                  <p>The paper you’re looking for moved, or never existed. Search for it, or browse every paper.</p>
+                  <form action='/search' class='error-search' method='get' role='search'>
+                    <input aria-label='Search The Pwavwe Papers' class='subscribe-input' name='q' placeholder='Search the papers' type='search'/>
+                    <button class='btn btn--solid' type='submit'>Search</button>
+                  </form>
+                  <div class='btn-row error-links'>
+                    <a class='btn' expr:href='data:blog.homepageUrl'>Homepage</a>
+                    <a class='btn' href='/p/all-papers.html'>All papers</a>
+                  </div>
                 </div>
               </section>
             <b:elseif cond='data:blog.pageType == &quot;static_page&quot;'/>
@@ -1935,7 +1953,11 @@ summary:focus-visible,
       var honeypot = document.getElementById(honeypotId);
       if (honeypot && honeypot.value) return;
       if (!email.value.trim() || !form.checkValidity()) { form.reportValidity(); return; }
-      if (newsletterStorageGet(newsletterSubscribedKey) === 'true') {
+      var address = email.value.trim().toLowerCase();
+      // The receipt is the address that subscribed here, so someone else on a
+      // shared browser can still sign up. 'true' is the older receipt format.
+      var receipt = newsletterStorageGet(newsletterSubscribedKey);
+      if (receipt === address || receipt === 'true') {
         if (message) message.textContent = 'You are already on the list — thank you.';
         return;
       }
@@ -1949,9 +1971,9 @@ summary:focus-visible,
       if (button) button.disabled = true;
       if (message) message.textContent = 'One moment\u2026';
       newsletterDb().then(function (db) {
-        return db.collection('subscribers').add({ email: email.value.trim().toLowerCase(), source: source, status: 'subscribed', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+        return db.collection('subscribers').add({ email: address, source: source, status: 'subscribed', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
       }).then(function () {
-        newsletterStorageSet(newsletterSubscribedKey, 'true');
+        newsletterStorageSet(newsletterSubscribedKey, address);
         form.reset();
         // The form gives way to the confirmation; focus follows so keyboard
         // users are not left on a hidden button.
@@ -1980,8 +2002,8 @@ summary:focus-visible,
   var commentsTemplate = document.getElementById('commentsTemplate');
   var commentsMount = document.getElementById('commentsMount');
   if (commentsGate && commentsTemplate && commentsMount) {
-    commentsGate.addEventListener('toggle', function () {
-      if (!commentsGate.open || commentsGate.getAttribute('data-loaded')) return;
+    var mountComments = function () {
+      if (commentsGate.getAttribute('data-loaded')) return;
       commentsGate.setAttribute('data-loaded', 'true');
       var fragment = commentsTemplate.content.cloneNode(true);
       Array.prototype.forEach.call(fragment.querySelectorAll('iframe'), function (frame) {
@@ -2021,7 +2043,32 @@ summary:focus-visible,
       }
 
       runCommentScript(0);
+    };
+    commentsGate.addEventListener('toggle', function () {
+      if (commentsGate.open) mountComments();
     });
+
+    // Blogger's comment emails and the comments feed link to
+    // ?showComment=…#c123. Open the discussion and go to that comment, which
+    // would otherwise sit unrendered inside the template.
+    var commentHash = window.location.hash;
+    var commentId = /^#c\d+$/.test(commentHash) ? commentHash.slice(1) : '';
+    if (commentId || commentHash === '#comments' || /[?&]showComment=/.test(window.location.search)) {
+      mountComments();
+      commentsGate.open = true;
+      var commentTarget = (commentId && document.getElementById(commentId)) || document.getElementById('comments');
+      if (commentTarget) {
+        // Jump rather than glide the length of the paper, and again once fonts
+        // and images have loaded, in case they moved the comment.
+        var jumpToComment = function () {
+          root.style.scrollBehavior = 'auto';
+          commentTarget.scrollIntoView({block: 'start'});
+          root.style.scrollBehavior = '';
+        };
+        jumpToComment();
+        if (document.readyState !== 'complete') window.addEventListener('load', jumpToComment, {once: true});
+      }
+    }
   }
 
   var content = document.getElementById('postContent');
@@ -2050,7 +2097,7 @@ summary:focus-visible,
           openUrl.searchParams.set('theme', 'auto');
           link.href = openUrl.href;
           playerUrl.searchParams.delete('theme');
-          paperAudio = { embedUrl: playerUrl.href, url: playerUrl.href };
+          paperAudio = { embedUrl: playerUrl.href, url: link.href };
           mount.appendChild(embed);
           audio.hidden = false;
           break;
