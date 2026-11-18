@@ -37,7 +37,7 @@
   <!-- Release stamp. Change it with every upload. The live check in
        scripts/check-theme.py compares it with the site to show which theme
        is installed. -->
-  <meta content='2026-11-05' name='pwavwe-theme-version'/>
+  <meta content='2026-11-18' name='pwavwe-theme-version'/>
 
   <!-- Browser and home-screen icons. The PNG is versioned with the theme so the
        Blogger template always points at a stable, cacheable asset. -->
@@ -2171,6 +2171,27 @@ summary:focus-visible,
         hero.appendChild(heroCaption);
       }
       lead.hidden = true;
+    })();
+
+    // Blogger crops the hero with a "-k" size option, which freezes a GIF on its
+    // first frame. Ask for the same crop without "-k" so a lead GIF plays. The
+    // still frame shows until the animation loads, and stays for readers who ask
+    // for less motion or less data.
+    (function playHeroGif() {
+      var img = document.querySelector('.article-hero img');
+      if (!img) return;
+      var url;
+      try { url = new URL(img.src); } catch (e) { return; }
+      if (!/(^|\.)(googleusercontent|blogspot)\.com$/.test(url.hostname) || !/\.gif$/i.test(url.pathname)) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (navigator.connection && navigator.connection.saveData) return;
+      var unfreeze = function (value) {
+        return value.replace(/\/([swh]\d+(?:-\w+)*)(\/[^\/?#\s,]+\.gif)/gi, function (match, options, file) {
+          return '/' + options.split('-').filter(function (option) { return option !== 'k'; }).join('-') + file;
+        });
+      };
+      if (img.srcset) img.srcset = unfreeze(img.srcset);
+      img.src = unfreeze(img.src);
     })();
 
     // Blogger cuts Search Descriptions at 150 characters. End a cut-off dek on

@@ -40,6 +40,7 @@ To see which theme the live site runs, use `python scripts/check-theme.py --live
 - No homepage card summary contains "Unsplash", "Wikimedia", "Listen to this paper", "ElevenLabs" or a URL. Check page 2 (**Older papers**) as well.
 - Papers with an AZ Studio or SoundCloud player show an **Audio edition** badge on their card. Cards no longer repeat "By Francis Pwavwe".
 - A paper whose first image has a caption shows that credit under the hero. The body does not repeat the hero image, including posts that open with a bare image (The Moana Effect, the Free AI Programme paper).
+- A paper whose first image is a GIF uploaded to Blogger plays it in the hero. With the device's reduce-motion setting on, the hero shows the GIF's first frame. Homepage cards always show the first frame.
 - A paper with a Search Description shows it under the title, ending on a full sentence. A paper without one shows nothing there.
 
 ### Reading page
